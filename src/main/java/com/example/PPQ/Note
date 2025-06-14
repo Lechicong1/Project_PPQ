@@ -1,0 +1,4 @@
+nếu class có khóa ngoại
+   khi thêm cần kiểm tra xem các khóa ngoại có tồn tại hay không rồi mới thêm ( tránh dữ liệu ảo)
+nếu class là khóa ngoại của bảng khác
+   khi muốn xóa class đó , phải xóa khóa ngoại ở bảng khác trước
