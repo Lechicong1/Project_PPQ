@@ -48,7 +48,7 @@ public class TeacherService implements TeacherServiceImp {
         User_Entity users = usersRepository.findByUsername(username);
         Teacher_Entity teacher = teacherRespository.findById(users.getId()).orElseThrow(() -> new ResourceNotFoundException("Giáo viên không tồn tại"));
         Teacher_response teacher_dto = new Teacher_response();
-        String Url =baseUrl+ "/upload/teachers/";
+        String Url =baseUrl+     "/upload/teachers/";
         System.out.println(Url+teacher.getImagePath());
         teacher_dto.setId(teacher.getId());
         teacher_dto.setPhoneNumber(teacher.getPhoneNumber());

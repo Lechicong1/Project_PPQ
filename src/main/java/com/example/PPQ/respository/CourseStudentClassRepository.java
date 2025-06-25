@@ -2,7 +2,6 @@ package com.example.PPQ.respository;
 
 import com.example.PPQ.Entity.CourseStudentKey;
 import com.example.PPQ.Entity.CourseStudentClassEntity;
-import com.example.PPQ.Payload.Response.CourseRegisterRespone;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -20,4 +19,5 @@ public interface CourseStudentClassRepository extends JpaRepository<CourseStuden
     List<CourseStudentClassEntity> searchCourseRegister(Integer idCourse,Integer idStudent,Integer idClass);
 
     List<CourseStudentClassEntity> findByIdClass(Integer idClass);
+    List<CourseStudentClassEntity> findIdClasByIdCourse(Integer idCourse);
 }

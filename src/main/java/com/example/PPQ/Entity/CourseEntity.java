@@ -11,8 +11,11 @@ public class CourseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int ID;
     private String nameCourse;
+    @Column(columnDefinition = "LONGTEXT")
     private String Description;
     private BigDecimal Fee;
+    private Integer numberSessions;
+    private String language;
 
     private String imagePath;
 
@@ -54,5 +57,21 @@ public class CourseEntity {
 
     public void setFee(BigDecimal fee) {
         Fee = fee;
+    }
+
+    public Integer getNumberSessions() {
+        return numberSessions;
+    }
+
+    public void setNumberSessions(Integer numberSessions) {
+        this.numberSessions = numberSessions;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
     }
 }

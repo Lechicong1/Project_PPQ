@@ -3,6 +3,7 @@ package com.example.PPQ.Security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -45,8 +46,10 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login","/register").permitAll()
-                            .requestMatchers("/upload/**","/contact").permitAll()
+                        .requestMatchers("/login","/register","courses/{courseId}").permitAll()
+                            .requestMatchers("/upload/**","/contact","/courses/languages").permitAll()
+                         .requestMatchers(HttpMethod.GET, "/courses").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/teachers").permitAll()
 
                         .anyRequest().authenticated()
                 )

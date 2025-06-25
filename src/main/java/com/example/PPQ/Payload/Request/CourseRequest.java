@@ -15,6 +15,26 @@ public class CourseRequest {
     @DecimalMin(value = "0.0", inclusive = true, message = "Phí khóa học phải lớn hơn hoặc bằng 0")
     @Digits(integer = 10, fraction = 2, message = "Phí khóa học chỉ được có tối đa 10 chữ số nguyên và 2 chữ số thập phân")
     private BigDecimal fee;
+    @NotNull(message = "Số buổi học không được để trống")
+    private Integer numberSessions;
+    @NotBlank(message = "Ngôn ngữ không được để trống")
+    private String language;
+
+    public Integer getNumberSessions() {
+        return numberSessions;
+    }
+
+    public void setNumberSessions(Integer numberSessions) {
+        this.numberSessions = numberSessions;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
 
     public String getNameCourse() {
         return nameCourse;

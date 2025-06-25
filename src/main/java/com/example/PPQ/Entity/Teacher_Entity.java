@@ -13,6 +13,7 @@ public class Teacher_Entity{
     private String fullName;
     private String phoneNumber;
     private String educationLevel;
+    @Column(columnDefinition = "LONGTEXT")
     private String description;
     private Integer idUsers;
     private String email;

@@ -12,5 +12,7 @@ public interface CourseServiceImp {
     boolean addCourse(CourseRequest courseRequest, MultipartFile file);
     boolean updateCourse(int id, CourseRequest courseRequest,MultipartFile file );
     boolean deleteCourse(int id);
-
+    List<String> getAllLanguages();
+    List<Course_response> getAllCoursesByLanguage(String language);
+    List<Course_response> getCourseByIdStudent();
 }

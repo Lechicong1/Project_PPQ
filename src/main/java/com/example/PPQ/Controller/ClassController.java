@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,24 @@ public class ClassController {
         ResponseData responseData = new ResponseData();
         HttpStatus status = HttpStatus.OK;
         List<Class_response> classResponses =classService.getAllClasses();
+        if(classResponses.size()>0) {
+            responseData.setData(classResponses);
+            responseData.setSuccess(Boolean.TRUE);
+            status = HttpStatus.OK;
+        }
+        else{
+            responseData.setData(null);
+            responseData.setSuccess(Boolean.FALSE);
+            status = HttpStatus.NOT_FOUND;
+        }
+        return ResponseEntity.status(status).body(responseData);
+    }
+    @PreAuthorize("hasAuthority('USER')")
+    @GetMapping(value = "/{idCourse}")
+    public ResponseEntity<?> getClassByIdCourse(@PathVariable int idCourse) {
+        ResponseData responseData = new ResponseData();
+        HttpStatus status = HttpStatus.OK;
+        List<Class_response> classResponses =classService.getClassByCourse(idCourse);
         if(classResponses.size()>0) {
             responseData.setData(classResponses);
             responseData.setSuccess(Boolean.TRUE);

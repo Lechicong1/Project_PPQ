@@ -1,6 +1,7 @@
 package com.example.PPQ.Controller;
 
 import com.example.PPQ.Payload.Request.UsersRequest;
+import com.example.PPQ.Payload.Request.changePasswordRequest;
 import com.example.PPQ.Payload.Response.ResponseData;
 import com.example.PPQ.Payload.Response.Users_response;
 import com.example.PPQ.Service.UserService;
@@ -36,6 +37,24 @@ public class UserController {
             responseData.setSuccess(false);
             status = HttpStatus.NOT_FOUND;
 
+        }
+        return ResponseEntity.status(status).body(responseData);
+    }
+    @PreAuthorize("hasAuthority('STUDENT') or hasAuthority('TEACHER')")
+    @PostMapping("/changePassword")
+    public ResponseEntity<?> changePassword(@Valid @RequestBody changePasswordRequest changePasswordRequest){
+        ResponseData responseData = new ResponseData();
+        HttpStatus status ;
+        if(userService.changePassword(changePasswordRequest)) {
+            responseData.setSuccess(true);
+
+            status = HttpStatus.CREATED;
+            responseData.setMessage("Đổi mật khẩu thành công");
+
+        }
+        else{
+            responseData.setSuccess(false);
+            status = HttpStatus.NOT_FOUND;
         }
         return ResponseEntity.status(status).body(responseData);
     }

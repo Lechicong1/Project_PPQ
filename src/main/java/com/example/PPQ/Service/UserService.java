@@ -3,8 +3,10 @@ package com.example.PPQ.Service;
 import com.example.PPQ.Entity.Roles_Entity;
 import com.example.PPQ.Entity.Teacher_Entity;
 import com.example.PPQ.Entity.User_Entity;
+import com.example.PPQ.Exception.BusinessLogicException;
 import com.example.PPQ.Exception.ResourceNotFoundException;
 import com.example.PPQ.Payload.Request.UsersRequest;
+import com.example.PPQ.Payload.Request.changePasswordRequest;
 import com.example.PPQ.Payload.Response.Users_response;
 import com.example.PPQ.Service_Imp.UserServiceImp;
 import com.example.PPQ.respository.Roles_respository;
@@ -121,15 +123,37 @@ import java.util.List;
         return list;
     }
 
+    @Override
+    public boolean changePassword(changePasswordRequest changePasswordRequest) {
+        var context = SecurityContextHolder.getContext();  // lay thong tin user dang dang nhap tai contextholder
+        String username = context.getAuthentication().getName();  // lay ra username
+        User_Entity users = users_repository.findByUsername(username);
+        if(users==null){
+            throw new ResourceNotFoundException("User không tồn tại");
+        }
+
+        if(!passwordEncoder.matches(changePasswordRequest.getOldPassword(), users.getPassword())){
+            throw new BusinessLogicException("Mật khẩu cũ không đúng ");}
+        if(passwordEncoder.matches(changePasswordRequest.getNewPassword(),users.getPassword() )){
+            throw new BusinessLogicException("Mật khẩu mới không được trùng với mật khẩu cũ ");}
+        if(!changePasswordRequest.getNewPassword().matches(changePasswordRequest.getConfirmPassword())){
+            throw new BusinessLogicException("Mật khẩu xác nhận không khớp với mật khẩu mới");
+            }
+
+        users.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
+        users_repository.save(users);
+        return true;
+    }
+
 //    @Override
 //    public Users_response myInfo() {
 //        var context= SecurityContextHolder.getContext();  // lay thong tin user dang dang nhap tai contextholder
 //        String username=context.getAuthentication().getName();  // lay ra username
 //        User_Entity users=users_repository.findByUsername(username);
 //        Users_response  userDTO = new Users_response();
-//        userDTO.setId(users.getId());
-//        userDTO.setUser_name(users.getUsername());
-//        userDTO.setIdRoles(users.getIdRoles());
+//        userDTO.setUserId(users.getId());
+//        userDTO.setUserName(users.getUsername());
+//        userDTO.setUserId(users.getIdRoles());
 //        return userDTO;
 //    }
 

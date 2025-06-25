@@ -1,13 +1,53 @@
 package com.example.PPQ.Payload.Response;
 
-import java.math.BigDecimal;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
-    public class Course_response {
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+public class Course_response {
         private Integer id;
         private String nameCourse;
         private String Description;
         private BigDecimal Fee;
         private String imagePath;
+        private Integer numberSessions;
+        private String language;
+        private  String nameClass;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        private LocalDateTime enrollmentDate;
+        public Integer getNumberSessions() {
+            return numberSessions;
+        }
+
+    public String getNameClass() {
+        return nameClass;
+    }
+
+    public void setNameClass(String nameClass) {
+        this.nameClass = nameClass;
+    }
+
+    public LocalDateTime getEnrollmentDate() {
+        return enrollmentDate;
+    }
+
+    public void setEnrollmentDate(LocalDateTime enrollmentDate) {
+        this.enrollmentDate = enrollmentDate;
+    }
+
+    public void setNumberSessions(Integer numberSessions) {
+            this.numberSessions = numberSessions;
+        }
+
+        public String getLanguage() {
+            return language;
+        }
+
+        public void setLanguage(String language) {
+            this.language = language;
+        }
+
         public Integer getId() {
         return id;
     }

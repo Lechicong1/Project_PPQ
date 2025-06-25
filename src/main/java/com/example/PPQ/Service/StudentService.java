@@ -1,20 +1,16 @@
 package com.example.PPQ.Service;
 
-import com.example.PPQ.Entity.CourseStudentClassEntity;
-import com.example.PPQ.Entity.Roles_Entity;
-import com.example.PPQ.Entity.Student_Entity;
-import com.example.PPQ.Entity.User_Entity;
+import com.example.PPQ.Entity.*;
 import com.example.PPQ.Exception.DuplicateResourceException;
 import com.example.PPQ.Exception.ResourceNotFoundException;
 import com.example.PPQ.Payload.Request.StudentRequest;
 import com.example.PPQ.Payload.Response.CourseRegisterRespone;
 import com.example.PPQ.Payload.Response.Student_response;
+import com.example.PPQ.Payload.Response.Teacher_response;
 import com.example.PPQ.Service_Imp.StudentServiceImp;
-import com.example.PPQ.respository.CourseStudentClassRepository;
-import com.example.PPQ.respository.Roles_respository;
-import com.example.PPQ.respository.StudentRespository;
-import com.example.PPQ.respository.UsersRepository;
+import com.example.PPQ.respository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -32,6 +28,8 @@ public class StudentService implements StudentServiceImp {
     Roles_respository rolesRespository;
     @Autowired
     CourseStudentClassRepository courseStudentClassRepository;
+    @Autowired
+    ClassRespository classRespository;
     @Override
     public List<Student_response> getAllStudents() {
         List<Student_response> student_dto = new ArrayList<>();
@@ -113,6 +111,13 @@ public class StudentService implements StudentServiceImp {
        }
        // xoa du lieu lien quan trong bang coursestudentclass truoc
         List<CourseStudentClassEntity> listcourse =courseStudentClassRepository.findByIdStudent(id);
+       // giam studentCurrent o bang class di 1 dua
+        for(CourseStudentClassEntity c : listcourse){
+            ClassesEntity classes= classRespository.findById(c.getIdClass()).orElseThrow(()->new ResourceNotFoundException("Không tồn tại user"));
+            classes.setCurrentStudents(classes.getCurrentStudents()-1);
+
+        }
+
        if(!listcourse.isEmpty()){
            courseStudentClassRepository.deleteAll(listcourse);
        }
@@ -123,6 +128,8 @@ public class StudentService implements StudentServiceImp {
             Roles_Entity roleUser=rolesRespository.findByRoleName("USER");
             userRoleStudent.setIdRoles(roleUser.getId());
             usersRepository.save(userRoleStudent);
+            // giam student cua lop do di 1 dua
+
             return true;
 
         }
@@ -149,6 +156,19 @@ public class StudentService implements StudentServiceImp {
             dto.setPhoneNumber(student.getPhoneNumber());
             return dto;
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public Student_response myInfo() {
+        var context = SecurityContextHolder.getContext();  // lay thong tin user dang dang nhap tai contextholder
+        String username = context.getAuthentication().getName();  // lay ra username
+        User_Entity users = usersRepository.findByUsername(username);
+       Student_Entity student = studentRespository.findById(users.getId()).orElseThrow(() -> new ResourceNotFoundException("Học sinh không tồn tại"));
+        Student_response student_dto = new Student_response();
+        student_dto.setId(student.getId());
+        student_dto.setPhoneNumber(student.getPhoneNumber());
+        student_dto.setFullName(student.getFullName());
+        return student_dto;
     }
 
 

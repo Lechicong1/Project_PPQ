@@ -13,4 +13,5 @@ public interface ClassServiceImp {
     boolean addClasses(ClassRequest classRequest);
     boolean updateClass(int id, ClassRequest classRequest);
     boolean deleteClass(int id);
+    List<Class_response> getClassByCourse(int idCourse);
 }

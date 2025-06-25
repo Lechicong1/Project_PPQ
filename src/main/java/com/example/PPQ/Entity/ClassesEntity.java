@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 public class ClassesEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer ID;
+    private Integer id;
     private String className;
     private Integer idCourses;
     private Integer idTeachers;
@@ -15,12 +15,13 @@ public class ClassesEntity {
     private int currentStudents=0;
     private String status;
 
-    public int getID() {
-        return ID;
+
+    public Integer getId() {
+        return id;
     }
 
-    public void setID(int ID) {
-        this.ID = ID;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getClassName() {
@@ -31,9 +32,6 @@ public class ClassesEntity {
         this.className = className;
     }
 
-    public void setID(Integer ID) {
-        this.ID = ID;
-    }
 
     public Integer getIdCourses() {
         return idCourses;

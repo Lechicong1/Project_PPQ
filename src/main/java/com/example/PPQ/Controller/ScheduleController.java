@@ -54,7 +54,7 @@ public class ScheduleController {
         }
         return ResponseEntity.status(status).body(responseData);
     }
-    @PreAuthorize("hasAuthority('USER')")
+    @PreAuthorize("hasAuthority('STUDENT')")
     @GetMapping("/myScheduleStudent")
     public ResponseEntity<?> getScheduleForStudent(){
         ResponseData responseData = new ResponseData();

@@ -126,5 +126,22 @@ public class StudentController {
         }
         return ResponseEntity.status(status).body(responseData);
     }
+    @GetMapping("/myInfo")
+    public ResponseEntity<?> getStudentInfo() {
+        ResponseData responseData = new ResponseData();
+        HttpStatus status ;
+        Student_response student_dto = studentService.myInfo();
+        if(student_dto!=null) {
+            responseData.setData(student_dto);
+            responseData.setSuccess(Boolean.TRUE);
+            status = HttpStatus.OK;
+        }
+        else{
+            responseData.setSuccess(Boolean.FALSE);
+            status = HttpStatus.NOT_FOUND;
+            responseData.setMessage("Không tìm thấy sinh viên !");
+        }
+        return ResponseEntity.status(status).body(responseData);
+    }
 
 }

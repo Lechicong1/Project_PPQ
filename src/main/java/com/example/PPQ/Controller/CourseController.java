@@ -15,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -22,11 +23,29 @@ import java.util.List;
 public class CourseController {
     @Autowired
     CourseService courseService;
-    @GetMapping
-    public ResponseEntity<?> getAllCourses() {
+    @GetMapping("/languages")
+    public ResponseEntity<?> getLanguages() {
         ResponseData responseData = new ResponseData();
         HttpStatus status = HttpStatus.OK;
-        List<Course_response> course_dto =courseService.getAllCourses();
+        List<String> languages =courseService.getAllLanguages();
+        if(languages.size()>0) {
+            responseData.setData(languages);
+            responseData.setSuccess(Boolean.TRUE);
+            status = HttpStatus.OK;
+        }
+        else{
+            responseData.setData(null);
+            responseData.setSuccess(Boolean.FALSE);
+            status = HttpStatus.NOT_FOUND;
+        }
+        return ResponseEntity.status(status).body(responseData);
+    }
+    @PreAuthorize("hasAuthority('STUDENT')")
+    @GetMapping("/myCourse")
+    public ResponseEntity<?> getCourseByIdStudent() {
+        ResponseData responseData = new ResponseData();
+        HttpStatus status = HttpStatus.OK;
+        List<Course_response> course_dto =courseService.getCourseByIdStudent();
         if(course_dto.size()>0) {
             responseData.setData(course_dto);
             responseData.setSuccess(Boolean.TRUE);
@@ -39,11 +58,34 @@ public class CourseController {
         }
         return ResponseEntity.status(status).body(responseData);
     }
-    @GetMapping(value="/{id}")
-    public ResponseEntity<?> getCourseById(@PathVariable int id) {
+    @GetMapping
+    public ResponseEntity<?> getAllCourses(@RequestParam(required = false) String languages) {
+        ResponseData responseData = new ResponseData();
+        HttpStatus status = HttpStatus.OK;
+        List<Course_response> course_dto =new ArrayList<>();
+        if(languages!=null) {
+            course_dto=courseService.getAllCoursesByLanguage(languages);
+        }
+        else{
+            course_dto=courseService.getAllCourses();
+        }
+        if(course_dto.size()>0) {
+            responseData.setData(course_dto);
+            responseData.setSuccess(Boolean.TRUE);
+            status = HttpStatus.OK;
+        }
+        else{
+            responseData.setData(null);
+            responseData.setSuccess(Boolean.FALSE);
+            status = HttpStatus.NOT_FOUND;
+        }
+        return ResponseEntity.status(status).body(responseData);
+    }
+    @GetMapping(value="/{courseId}")
+    public ResponseEntity<?> getCourseById(@PathVariable int courseId) {
         ResponseData responseData = new ResponseData();
         HttpStatus status ;
-        Course_response course_dto = courseService.getCourseByID(id);
+        Course_response course_dto = courseService.getCourseByID(courseId);
         if(course_dto !=null) {
             responseData.setData(course_dto);
             responseData.setSuccess(Boolean.TRUE);
@@ -52,6 +94,7 @@ public class CourseController {
         else{
             responseData.setData(null);
             responseData.setSuccess(Boolean.FALSE);
+            responseData.setMessage("Không tìm thấy khóa học");
             status = HttpStatus.NOT_FOUND;
         }
         return ResponseEntity.status(status).body(responseData);
@@ -83,7 +126,7 @@ public class CourseController {
         return ResponseEntity.status(status).body(responseData);
     }
     @PutMapping(value = "/{id}")
-    public ResponseEntity<?> updateCourse(@PathVariable int id, @Valid  @RequestPart("courseRequestStr") String courseRequestStr, @RequestPart("file") MultipartFile file) {
+    public ResponseEntity<?> updateCourse(@PathVariable int id, @Valid  @RequestPart("courseRequestStr") String courseRequestStr, @RequestPart(value = "file", required = false)  MultipartFile file) {
         ResponseData responseData = new ResponseData();
         HttpStatus status = HttpStatus.OK;
         ObjectMapper objectMapper = new ObjectMapper();

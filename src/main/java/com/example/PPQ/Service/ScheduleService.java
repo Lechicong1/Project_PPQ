@@ -182,6 +182,8 @@ public class ScheduleService implements ScheduleServiceImp {
             schedule_dto.setThu(y.getThu());
             schedule_dto.setNameRoom(y.getNameRoom());
             schedule_dto.setId(y.getId());
+            CourseEntity course_teacher = courseRespository.findById(classes.getIdCourses()).orElseThrow(()->new ResourceNotFoundException("Khóa học không tồn tại "));
+            schedule_dto.setNameCourse(course_teacher.getNameCourse()); 
             listSchedule_dto.add(schedule_dto);
         }
         return listSchedule_dto;
@@ -205,7 +207,7 @@ public class ScheduleService implements ScheduleServiceImp {
             }
             List<Schedule_Entity> listSchedule = new ArrayList<>();
             for(ClassesEntity x : class_entity){
-                List<Schedule_Entity > schedule = scheduleRespository.findByIdClass(x.getID());
+                List<Schedule_Entity > schedule = scheduleRespository.findByIdClass(x.getId());
                 listSchedule.addAll(schedule);
             }
             List<Schedule_response> listSchedule_dto=new ArrayList<>();

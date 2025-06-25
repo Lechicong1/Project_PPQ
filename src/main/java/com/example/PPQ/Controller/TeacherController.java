@@ -22,7 +22,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/teachers")
-@PreAuthorize("hasAuthority('ADMIN')")
+//@PreAuthorize("hasAuthority('ADMIN')")
 public class TeacherController {
     @Autowired
     TeacherRespository teacherRespository;

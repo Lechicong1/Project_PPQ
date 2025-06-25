@@ -17,7 +17,7 @@ import java.util.List;
 @Service
 public class ClassService implements ClassServiceImp {
     @Autowired
-    ClassRespository ClassRepository;
+    ClassRespository classRepository;
     @Autowired
     CourseRespository CourseRepository;
     @Autowired
@@ -31,10 +31,10 @@ public class ClassService implements ClassServiceImp {
     @Override
     public List<Class_response> getAllClasses() {
         List<Class_response> list = new ArrayList<Class_response>();
-        List<ClassesEntity> listclass=ClassRepository.findAll();
+        List<ClassesEntity> listclass=classRepository.findAll();
         for(ClassesEntity c:listclass){
             Class_response class_dto=new Class_response();
-            class_dto.setId(c.getID());
+            class_dto.setId(c.getId());
             class_dto.setClassName(c.getClassName());
             class_dto.setStatus(c.getStatus());
             class_dto.setCurrentStudents(c.getCurrentStudents());
@@ -71,11 +71,11 @@ public class ClassService implements ClassServiceImp {
             throw new ResourceNotFoundException("Không tồn tại User");
         }
         Teacher_Entity teacher=TeacherRepository.findById(user.getId()).orElseThrow(()->new ResourceNotFoundException("Giáo viên không tồn tại"));
-        List<ClassesEntity> class_entity=ClassRepository.findByIdTeachers(teacher.getId());
+        List<ClassesEntity> class_entity=classRepository.findByIdTeachers(teacher.getId());
         List<Class_response> list = new ArrayList<Class_response>();
         for(ClassesEntity c:class_entity){
             Class_response class_dto=new Class_response();
-            class_dto.setId(c.getID());
+            class_dto.setId(c.getId());
             class_dto.setClassName(c.getClassName());
             class_dto.setStatus(c.getStatus());
             class_dto.setCurrentStudents(c.getCurrentStudents());
@@ -107,7 +107,7 @@ public class ClassService implements ClassServiceImp {
         //Kiem tra ton tai id_teacher k
         Teacher_Entity teacherEntity=TeacherRepository.findById(classRequest.getIdTeachers()).orElseThrow(()->new RuntimeException("Giáo viên không tồn tại"));
         //kiem tra xem lop da ton tai chua
-        ClassesEntity classes=ClassRepository.findByClassName(classRequest.getClassName());
+        ClassesEntity classes=classRepository.findByClassName(classRequest.getClassName());
         if(classes!=null){
             throw new DuplicateResourceException("Đã tồn tại lớp học này rồi");
         }
@@ -118,7 +118,7 @@ public class ClassService implements ClassServiceImp {
         c.setIdTeachers(classRequest.getIdTeachers());
         c.setStatus(classRequest.getStatus());
         try{
-            ClassRepository.save(c);
+            classRepository.save(c);
             return true;
         }
         catch(Exception e){
@@ -130,7 +130,7 @@ public class ClassService implements ClassServiceImp {
 
     @Override
     public boolean updateClass(int id, ClassRequest classRequest) {
-        ClassesEntity classes=ClassRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Lớp học không tồn tại"));
+        ClassesEntity classes=classRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Lớp học không tồn tại"));
         if(classRequest.getClassName()!=null){
             classes.setClassName(classRequest.getClassName());
         }
@@ -148,7 +148,7 @@ public class ClassService implements ClassServiceImp {
        }
 
         try{
-            ClassRepository.save(classes);
+            classRepository.save(classes);
             return true;
         }
         catch(Exception e){
@@ -160,7 +160,7 @@ public class ClassService implements ClassServiceImp {
     @Override
     public boolean deleteClass(int id) {
         //xoa schedule truoc vi id_class dang la khoa ngoai o bang schedule
-        if(!ClassRepository.existsById(id)){
+        if(!classRepository.existsById(id)){
             throw new ResourceNotFoundException("Lớp học không tồn tại");
         }
         List<Schedule_Entity> schedule =scheduleRespository.findByIdClass(id);
@@ -173,7 +173,7 @@ public class ClassService implements ClassServiceImp {
             courseStudentClassRepository.deleteAll(courseclass);
         }
         try{
-            ClassRepository.deleteById(id);
+            classRepository.deleteById(id);
 
             return true;
         }   
@@ -182,5 +182,18 @@ public class ClassService implements ClassServiceImp {
             return false;
         }
 
+    }
+
+    @Override
+    public List<Class_response> getClassByCourse(int idCourse) {
+        List<Class_response> listClassResponse=new ArrayList<>();
+        List<ClassesEntity > listClassEntity=classRepository.findByIdCourses(idCourse);
+        for(ClassesEntity c:listClassEntity){
+            Class_response classresponse=new Class_response();
+            classresponse.setId(c.getId());
+            classresponse.setClassName(c.getClassName());
+            listClassResponse.add(classresponse);
+        }
+        return listClassResponse;
     }
 }

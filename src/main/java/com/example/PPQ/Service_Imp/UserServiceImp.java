@@ -1,6 +1,7 @@
 package com.example.PPQ.Service_Imp;
 
 import com.example.PPQ.Payload.Request.UsersRequest;
+import com.example.PPQ.Payload.Request.changePasswordRequest;
 import com.example.PPQ.Payload.Response.Users_response;
 
 import java.util.List;
@@ -11,5 +12,6 @@ public interface UserServiceImp {
     boolean updateUsers(int id, UsersRequest usersRequest);
     boolean addUsers(UsersRequest usersRequest);
     List<Users_response> getAllUserByRoleTeacher();
+    boolean changePassword(changePasswordRequest changePasswordRequest);
 //    Users_response myInfo();
 }

@@ -1,5 +1,7 @@
 package com.example.PPQ.Payload.Response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.LocalDateTime;
 
 public class CourseRegisterRespone {
@@ -9,7 +11,8 @@ public class CourseRegisterRespone {
     private String nameCourse;
     private String nameStudent;
     private String nameClass;
-    private LocalDateTime EnrollmentDate;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime enrollmentDate;
 
     public int getIdCourse() {
         return idCourse;
@@ -60,10 +63,10 @@ public class CourseRegisterRespone {
     }
 
     public LocalDateTime getEnrollmentDate() {
-        return EnrollmentDate;
+        return enrollmentDate;
     }
 
     public void setEnrollmentDate(LocalDateTime enrollmentDate) {
-        EnrollmentDate = enrollmentDate;
+        this.enrollmentDate = enrollmentDate;
     }
 }
