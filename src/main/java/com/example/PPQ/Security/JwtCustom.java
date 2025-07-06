@@ -52,7 +52,7 @@ public class JwtCustom {
                 .claim("authorities",authorities)
                 .build();
         JwsHeader jwsHeader=JwsHeader.with(JWT_ALGORITHM).build();
-        return jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader,claims)).getTokenValue();
+        return jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader,claims)).getTokenValue();  // tao chu ky so gom khoa bi mat va thong diep(payload)
         }
         // token co 3 phan header.payload.signature
         // header : chua thong tin thuat toan ma hoa

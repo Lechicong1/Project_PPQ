@@ -31,7 +31,7 @@ public class JwtConfig {
     }
     // giai ma token duoc gui tu header
     @Bean
-    public JwtDecoder JwtDecoder() {
+    public JwtDecoder JwtDecoder() {    // xac thuc chu ky so
         NimbusJwtDecoder  jwtDecoder=NimbusJwtDecoder.withSecretKey(
                 getSecretKey()).macAlgorithm(JwtCustom.JWT_ALGORITHM).build();
         return token -> {

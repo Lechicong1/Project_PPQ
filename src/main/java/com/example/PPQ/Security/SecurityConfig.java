@@ -46,6 +46,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // ✅ Cho phép preflight CORS
                         .requestMatchers("/login","/register","courses/{courseId}").permitAll()
                             .requestMatchers("/upload/**","/contact","/courses/languages").permitAll()
                          .requestMatchers(HttpMethod.GET, "/courses").permitAll()
@@ -63,13 +64,18 @@ public class SecurityConfig {
         return http.build();
     }
 
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://127.0.0.1:5500")); // ✅ hoặc http://localhost:5500
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+        config.setAllowedOriginPatterns(List.of("*")); // ✅ Cho tất cả domain, phù hợp cho máy ảo, máy thật
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
+        config.setAllowCredentials(true); // ✅ Cho phép gửi token/cookie
+
+        // (Tuỳ chọn) In ra log kiểm tra
+        System.out.println("✅ CORS config đã được apply");
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;

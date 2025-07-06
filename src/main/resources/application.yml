@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3307/PPQ
+    url: jdbc:mysql://192.168.0.160:3306/PPQ?useSSL=false&serverTimezone=UTC
     username: root
     password: admin123
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -22,7 +22,7 @@ spring:
     resources:
       static-locations:
         - classpath:/static/
-        - file:upload/
+        - file:/home/lechicong/upload/
 
   mail:
     host: smtp.gmail.com
@@ -44,7 +44,7 @@ security:
       base64-secret: WlSKedhlklTqSrR1VajEv/U46TLFKfLGqNk5d8MqfkNfyuHTuRpeu5bQCxxvvRlRk1G/F6WahwflnqKZP40KaQ==
       token-validity-in-seconds: 86400
 app:
-  base-url: ${BASE_URL:http://localhost:8080}
+  base-url: ${BASE_URL:http://192.168.0.160:8080}
 payment:
   bank-code: TPB
   account-number: 77163476666
