@@ -12,13 +12,21 @@ import com.example.PPQ.Service_Imp.UserServiceImp;
 import com.example.PPQ.respository.Roles_respository;
 import com.example.PPQ.respository.TeacherRespository;
 import com.example.PPQ.respository.UsersRepository;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 @Service
     public class UserService implements UserServiceImp {
     @Autowired
@@ -32,12 +40,18 @@ import java.util.List;
     @Override
     public List<Users_response> getAllUsers() {
         List<User_Entity> users = users_repository.getAllUsersBasic();
+        Set<Integer> listIdRoles = users.stream().map(User_Entity::getIdRoles).collect(Collectors.toSet());
+        List<Roles_Entity> listRole = roles_repository.findAllByIdIn((listIdRoles));
+        Map<Integer,Roles_Entity> roleMap= listRole.stream().collect(Collectors.toMap(Roles_Entity::getId, Function.identity()));
         List<Users_response> list = new ArrayList<>();
         for (User_Entity user : users) {
             Users_response userResponse = new Users_response();
             userResponse.setUserId(user.getId());
             userResponse.setUserName(user.getUsername());
-            Roles_Entity rolesEntity=roles_repository.findById(user.getIdRoles()).orElseThrow(()->new ResourceNotFoundException("Không tồn tại role"));
+            Roles_Entity rolesEntity= roleMap.get(user.getIdRoles());
+            if (rolesEntity == null) {
+                throw new ResourceNotFoundException("Không tồn tại role cho user id: " + user.getId());
+            }
             //tra ve ten role thay vi id
             userResponse.setRoleName(rolesEntity.getRoleName());
             list.add(userResponse);
@@ -55,7 +69,7 @@ import java.util.List;
             return true;
         }
         catch(Exception e){
-            System.out.println("co loi khi xoa user " + e.getMessage());
+            System.out.println("Có lỗi khi xóa user" + e.getMessage());
             return false;
         }
 
@@ -77,7 +91,7 @@ import java.util.List;
             return true;
         }
         catch(Exception e){
-            System.out.println("co loi khi sua user " + e.getMessage());
+            System.out.println("Có lỗi khi sửa user " + e.getMessage());
             return false;
         }
 
@@ -105,12 +119,14 @@ import java.util.List;
         if(role_teacher==null){
             throw new ResourceNotFoundException("Role Teacher không tồn tại");
         }
-        List<User_Entity> ListUserEntity= users_repository.findByIdRoles(role_teacher.getId());
-
+        List<User_Entity> usersWithTeacherRole= users_repository.findByIdRoles(role_teacher.getId());
+        Set<Integer> idUser = usersWithTeacherRole.stream().map(User_Entity::getId).collect(Collectors.toSet());
+        List<Teacher_Entity> listTeacher = teachers_repository.findAllByIdUsersIn((idUser));
+        Map<Integer,Teacher_Entity> mapTeacher = listTeacher.stream().collect(Collectors.toMap(Teacher_Entity::getIdUsers, Function.identity()));
         List<Users_response> list = new ArrayList<>();
-        for (User_Entity user : ListUserEntity) {
+        for (User_Entity user : usersWithTeacherRole) {
             // tim xem id_user da co trong bảng teacher chưa (nếu có rồi sẽ k hiện lên combobox nữa để tránh 2 giáo viên chung 1 id_user)
-            Teacher_Entity teacher=teachers_repository.findByIdUsers(user.getId());
+            Teacher_Entity teacher=mapTeacher.get(user.getId());
             if(teacher!=null) continue;
             Users_response userResponse = new Users_response();
             userResponse.setUserId(user.getId());
@@ -122,7 +138,8 @@ import java.util.List;
         }
         return list;
     }
-
+    @Autowired
+    RedisTemplate redisTemplate;
     @Override
     public boolean changePassword(changePasswordRequest changePasswordRequest) {
         var context = SecurityContextHolder.getContext();  // lay thong tin user dang dang nhap tai contextholder
@@ -139,6 +156,7 @@ import java.util.List;
         if(!changePasswordRequest.getNewPassword().matches(changePasswordRequest.getConfirmPassword())){
             throw new BusinessLogicException("Mật khẩu xác nhận không khớp với mật khẩu mới");
             }
+
 
         users.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
         users_repository.save(users);

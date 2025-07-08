@@ -1,4 +1,4 @@
-package com.example.PPQ.Security;
+package com.example.PPQ.Config;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import org.springframework.beans.factory.annotation.Value;

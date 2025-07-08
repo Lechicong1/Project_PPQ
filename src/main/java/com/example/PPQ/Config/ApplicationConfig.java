@@ -1,4 +1,4 @@
-package com.example.PPQ.Security;
+package com.example.PPQ.Config;
 
 import com.example.PPQ.Entity.User_Entity;
 import com.example.PPQ.respository.UsersRepository;

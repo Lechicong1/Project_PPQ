@@ -1,17 +1,20 @@
-package com.example.PPQ.Security;
+package com.example.PPQ.Config;
 
 import com.example.PPQ.Entity.Roles_Entity;
 import com.example.PPQ.Entity.User_Entity;
-import com.example.PPQ.Exception.ResourceNotFoundException;
 import com.example.PPQ.respository.Roles_respository;
 import com.example.PPQ.respository.UsersRepository;
+import org.hibernate.annotations.Cache;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.List;
 
 @Service
@@ -20,6 +23,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     UsersRepository usersRepo;
     @Autowired
     Roles_respository roles_respository;
+    @Autowired
+    RedisTemplate redisTemplate;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User_Entity user = usersRepo.findByUsername(username);
@@ -31,5 +36,5 @@ public class CustomUserDetailsService implements UserDetailsService {
                 user.getUsername(),
                 user.getPassword(),
                 List.of(new SimpleGrantedAuthority(rolesEntity.getRoleName())));
-    }  // tao ra doi tuong User cua spring de xac thuc va phan quyen nguoi dung
+    } // tao ra doi tuong User cua spring de xac thuc va phan quyen nguoi dung
 }

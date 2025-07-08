@@ -13,6 +13,6 @@ public interface ScheduleServiceImp {
     boolean addSchedule(ScheduleRequest scheduleRequest);
     boolean updateSchedule(int id, ScheduleRequest scheduleRequest);
     boolean deleteSchedule(int id);
-    List<Schedule_response> getScheduleForStudent();
-    List<Schedule_response> getScheduleForTeacher();
+    List<Schedule_response> getScheduleForStudent(String username);
+    List<Schedule_response> getScheduleForTeacher(String username);
 }

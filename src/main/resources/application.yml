@@ -1,6 +1,15 @@
 spring:
+  cache:
+    type: redis
+    redis:
+      time-to-live: 3600000  # TTL cho cache: 1 giờ
+  data:
+      redis:
+        host: localhost
+        port: 6380
+        database: 0
   datasource:
-    url: jdbc:mysql://192.168.0.160:3306/PPQ?useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3307/PPQ
     username: root
     password: admin123
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -22,7 +31,8 @@ spring:
     resources:
       static-locations:
         - classpath:/static/
-        - file:/home/lechicong/upload/
+        - file:upload/
+
 
   mail:
     host: smtp.gmail.com
@@ -44,7 +54,7 @@ security:
       base64-secret: WlSKedhlklTqSrR1VajEv/U46TLFKfLGqNk5d8MqfkNfyuHTuRpeu5bQCxxvvRlRk1G/F6WahwflnqKZP40KaQ==
       token-validity-in-seconds: 86400
 app:
-  base-url: ${BASE_URL:http://192.168.0.160:8080}
+  base-url: ${BASE_URL:http://localhost:8080}
 payment:
   bank-code: TPB
   account-number: 77163476666

@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,9 +27,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class TeacherService implements TeacherServiceImp {
@@ -60,7 +62,7 @@ public class TeacherService implements TeacherServiceImp {
         teacher_dto.setImagePath(Url+teacher.getImagePath());
         return teacher_dto;
     }
-
+    @Transactional
     @Override
     public boolean addTeacher(TeacherRequest teacherRequest, MultipartFile file) {
         // check xem co ton tai user khong ( co user moi co teacher)
@@ -105,7 +107,7 @@ public class TeacherService implements TeacherServiceImp {
             return true;
         }
         catch (Exception e) {
-            System.out.println("co loi khi them teacher" + e.getMessage());
+            System.out.println("Có lỗi khi thêm Teacher " + e.getMessage());
             return false;
         }
 
@@ -113,44 +115,42 @@ public class TeacherService implements TeacherServiceImp {
     }
 
 
-
+    @Transactional
     @Override
     public boolean deleteTeacher(int id) {
-        Teacher_Entity teacherDelete=teacherRespository.findById(id).orElseThrow(()->new ResourceNotFoundException("Không tồn tại giáo viên để xóa"));
-        // set role ở bảng user từ teacher thành user
-        // tim role user
-        Roles_Entity roleUser=rolesRespository.findByRoleName("USER");
-        User_Entity user =usersRepository.findById(teacherDelete.getIdUsers()).orElseThrow(()->new ResourceNotFoundException("User không tồn tại"));
-        user.setIdRoles(roleUser.getId());
-        //cho idTeacher o bang class la null
-        List<ClassesEntity> classesEntity=classRespository.findByIdTeachers(id);
-        System.out.println("test size class " + classesEntity.size());
-        if(!classesEntity.isEmpty()) {
-            try{
-                for (ClassesEntity cls : classesEntity) {
-                    cls.setIdTeachers(null);
-                }
-                classRespository.saveAll(classesEntity);  }
-            catch (Exception e) {
-                System.out.println("co loi khi xoa class " + e.getMessage());
-            }
-
-        }
-        // Lấy tên file ảnh
-        String fileName = teacherDelete.getImagePath(); // ví dụ: "abc123.jpg"
-        String fullPath = "upload/teachers/" + fileName;
-        //xoa anh
-        File file = new File(fullPath);
-        if (file.exists()) {
-            file.delete();
-        }
         try{
+            Teacher_Entity teacherDelete=teacherRespository.findById(id).orElseThrow(()->new ResourceNotFoundException("Không tồn tại giáo viên để xóa"));
+            // set role ở bảng user từ teacher thành user
+            // tim role user
+            Roles_Entity roleUser=rolesRespository.findByRoleName("USER");
+            if(roleUser==null) {
+                throw new ResourceNotFoundException("Không tồn tại ROLE USER");
+            }
+            User_Entity user =usersRepository.findById(teacherDelete.getIdUsers()).orElseThrow(()->new ResourceNotFoundException("User không tồn tại"));
+            user.setIdRoles(roleUser.getId());
+            //cho idTeacher o bang class la null
+            List<ClassesEntity> classesEntity=classRespository.findByIdTeachers(id);
+
+            if(!classesEntity.isEmpty()) {
+                for (ClassesEntity cls : classesEntity) {
+                    cls.setIdTeachers(null);}
+                    classRespository.saveAll(classesEntity);
+            }
+            // Lấy tên file ảnh
+            String fileName = teacherDelete.getImagePath(); // ví dụ: "abc123.jpg"
+            String fullPath = "upload/teachers/" + fileName;
+            //xoa anh
+            File file = new File(fullPath);
+            if (file.exists()) {
+                file.delete();
+            }
             teacherRespository.deleteById(id);
             usersRepository.save(user);
             return true;
         }
-        catch(Exception e){
-            System.out.println("co loi khi xoa teacher");
+        catch (Exception e) {
+            System.out.println("Có lỗi khi xóa giáo viên: " + e.getMessage());
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return false;
         }
     }
@@ -198,6 +198,7 @@ public class TeacherService implements TeacherServiceImp {
             return true;
         } catch (Exception e) {
             System.out.println("Lỗi khi sửa teacher: " + e.getMessage());
+
             return false;
         }
     }
@@ -208,6 +209,9 @@ public class TeacherService implements TeacherServiceImp {
         if(teacher.isEmpty()){
             throw new ResourceNotFoundException("Hệ thống chưa có giáo viên nào ");
         }
+        Set<Integer> listIdUsers = teacher.stream().map(Teacher_Entity::getIdUsers).collect(Collectors.toSet());
+        List<User_Entity> listUser = usersRepository.findAllByIdIn(listIdUsers);
+        Map<Integer,User_Entity> mapUser = listUser.stream().collect(Collectors.toMap(User_Entity::getId, Function.identity()));
         for(Teacher_Entity teacherEntity:teacher){
             String Url = baseUrl+"/upload/teachers/";
             Teacher_response teacherResponse=new Teacher_response();
@@ -215,7 +219,9 @@ public class TeacherService implements TeacherServiceImp {
             teacherResponse.setDescription(teacherEntity.getDescription());
             teacherResponse.setEducationLevel(teacherEntity.getEducationLevel());
             //tra ve username thay vi iduser
-            User_Entity users=usersRepository.findById(teacherEntity.getIdUsers()).orElseThrow(()-> new ResourceNotFoundException("Không tồn tại user"));
+            User_Entity users=mapUser.get(teacherEntity.getIdUsers());
+                  if(users==null)
+                      throw new ResourceNotFoundException("Không tồn tại user");
             teacherResponse.setUserName(users.getUsername());
             teacherResponse.setFullName(teacherEntity.getFullName());
             teacherResponse.setPhoneNumber(teacherEntity.getPhoneNumber());

@@ -13,4 +13,6 @@ public interface ScheduleRespository extends JpaRepository<Schedule_Entity,Integ
     Schedule_Entity findByIdClassAndThuAndStartTime(int idClass, String thu , LocalTime gioHoc);
     Schedule_Entity findByNameRoomAndThuAndStartTime(String nameRoom , String thu , LocalTime gioHoc);
     List<Schedule_Entity> findByIdClass(int idClass);
+
+    List<Schedule_Entity> findByIdClassIn(List<Integer> listClassId);
 }

@@ -1,14 +1,18 @@
 package com.example.PPQ.Controller;
 
+import com.example.PPQ.Entity.User_Entity;
+import com.example.PPQ.Exception.ResourceNotFoundException;
 import com.example.PPQ.Payload.Request.ScheduleRequest;
 import com.example.PPQ.Payload.Response.ResponseData;
 import com.example.PPQ.Payload.Response.Schedule_response;
 import com.example.PPQ.Service.ScheduleService;
+import com.example.PPQ.respository.UsersRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +23,8 @@ import java.util.List;
 public class ScheduleController {
     @Autowired
     ScheduleService scheduleService;
+    @Autowired
+    UsersRepository UsersRepository;
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> getAllSchedules() {
@@ -59,7 +65,9 @@ public class ScheduleController {
     public ResponseEntity<?> getScheduleForStudent(){
         ResponseData responseData = new ResponseData();
         HttpStatus status ;
-        List<Schedule_response> scheduleResponses =scheduleService.getScheduleForStudent();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username=auth.getName();
+        List<Schedule_response> scheduleResponses =scheduleService.getScheduleForStudent(username);
         if(scheduleResponses !=null) {
             responseData.setData(scheduleResponses);
             responseData.setSuccess(Boolean.TRUE);
@@ -76,7 +84,9 @@ public class ScheduleController {
     public ResponseEntity<?> getScheduleForTeacher(){
         ResponseData responseData = new ResponseData();
         HttpStatus status ;
-        List<Schedule_response> scheduleResponses =scheduleService.getScheduleForTeacher();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username=auth.getName();
+        List<Schedule_response> scheduleResponses =scheduleService.getScheduleForTeacher(username);
         if(scheduleResponses !=null) {
             responseData.setData(scheduleResponses);
             responseData.setSuccess(Boolean.TRUE);
