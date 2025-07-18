@@ -1,10 +1,8 @@
 package com.example.PPQ.Controller;
 
-import com.example.PPQ.Entity.User_Entity;
-import com.example.PPQ.Exception.ResourceNotFoundException;
 import com.example.PPQ.Payload.Request.ScheduleRequest;
 import com.example.PPQ.Payload.Response.ResponseData;
-import com.example.PPQ.Payload.Response.Schedule_response;
+import com.example.PPQ.Payload.Response.ScheduleDTO;
 import com.example.PPQ.Service.ScheduleService;
 import com.example.PPQ.respository.UsersRepository;
 import jakarta.validation.Valid;
@@ -27,37 +25,34 @@ public class ScheduleController {
     UsersRepository UsersRepository;
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> getAllSchedules() {
+    public ResponseEntity<?> getAllSchedules(){
         ResponseData responseData = new ResponseData();
         HttpStatus status = HttpStatus.OK;
-        List<Schedule_response> scheduleResponses =scheduleService.gettAllSchedule();
-        if(scheduleResponses.size()>0) {
+        List<ScheduleDTO> scheduleResponses =scheduleService.gettAllSchedule();
             responseData.setData(scheduleResponses);
             responseData.setSuccess(Boolean.TRUE);
             status = HttpStatus.OK;
-        }
-        else{
-            responseData.setData(null);
-            responseData.setSuccess(Boolean.FALSE);
-            status = HttpStatus.NOT_FOUND;
-        }
+        return ResponseEntity.status(status).body(responseData);
+    }
+    @GetMapping("/search")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> getSdcheduleByDayOfWeekAndClass(@RequestParam(required = false) String thu,@RequestParam(required = false) Integer idClass){
+        ResponseData responseData = new ResponseData();
+        HttpStatus status = HttpStatus.OK;
+        List<ScheduleDTO> scheduleResponses =scheduleService.findScheduleByDayOfWeekAndClass(thu,idClass);
+        responseData.setData(scheduleResponses);
+        responseData.setSuccess(Boolean.TRUE);
+        status = HttpStatus.OK;
         return ResponseEntity.status(status).body(responseData);
     }
     @GetMapping(value="/{id}")
     public ResponseEntity<?> getScheduleById(@PathVariable int id) {
         ResponseData responseData = new ResponseData();
         HttpStatus status ;
-        Schedule_response schedule_dto = scheduleService.getScheduleById(id);
-        if(schedule_dto !=null) {
+        ScheduleDTO schedule_dto = scheduleService.getScheduleById(id);
             responseData.setData(schedule_dto);
             responseData.setSuccess(Boolean.TRUE);
             status = HttpStatus.OK;
-        }
-        else{
-            responseData.setData(null);
-            responseData.setSuccess(Boolean.FALSE);
-            status = HttpStatus.NOT_FOUND;
-        }
         return ResponseEntity.status(status).body(responseData);
     }
     @PreAuthorize("hasAuthority('STUDENT')")
@@ -67,17 +62,10 @@ public class ScheduleController {
         HttpStatus status ;
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username=auth.getName();
-        List<Schedule_response> scheduleResponses =scheduleService.getScheduleForStudent(username);
-        if(scheduleResponses !=null) {
+        List<ScheduleDTO> scheduleResponses =scheduleService.getScheduleForStudent(username);
             responseData.setData(scheduleResponses);
             responseData.setSuccess(Boolean.TRUE);
             status = HttpStatus.OK;
-        }
-        else{
-            responseData.setData(null);
-            responseData.setSuccess(Boolean.FALSE);
-            status = HttpStatus.NOT_FOUND;
-        }
         return ResponseEntity.status(status).body(responseData);
     }
     @GetMapping("/myScheduleTeacher")
@@ -86,67 +74,40 @@ public class ScheduleController {
         HttpStatus status ;
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username=auth.getName();
-        List<Schedule_response> scheduleResponses =scheduleService.getScheduleForTeacher(username);
-        if(scheduleResponses !=null) {
+        List<ScheduleDTO> scheduleResponses =scheduleService.getScheduleForTeacher(username);
             responseData.setData(scheduleResponses);
             responseData.setSuccess(Boolean.TRUE);
             status = HttpStatus.OK;
-        }
-        else{
-            responseData.setData(null);
-            responseData.setSuccess(Boolean.FALSE);
-            status = HttpStatus.NOT_FOUND;
-        }
         return ResponseEntity.status(status).body(responseData);
     }
     @PostMapping
     public ResponseEntity<?> addSchedule( @Valid @RequestBody ScheduleRequest scheduleRequest) {
         ResponseData responseData = new ResponseData();
         HttpStatus status = HttpStatus.OK;
-        if(scheduleService.addSchedule(scheduleRequest)) {
+        scheduleService.addSchedule(scheduleRequest);
             responseData.setSuccess(Boolean.TRUE);
             status = HttpStatus.CREATED;
-            responseData.setMessage("schedule added successfully");
-        }
-        else{
-            responseData.setSuccess(Boolean.FALSE);
-            status = HttpStatus.NOT_FOUND;
-            responseData.setMessage("schedule not added successfully");
-        }
+            responseData.setMessage("Thêm lịch học thành công ");
         return ResponseEntity.status(status).body(responseData);
     }
     @PutMapping(value = "/{id}")
     public ResponseEntity<?> updateSchedule(@PathVariable int id,@Valid @RequestBody ScheduleRequest scheduleRequest) {
         ResponseData responseData = new ResponseData();
         HttpStatus status = HttpStatus.OK;
-        if(scheduleService.updateSchedule(id,scheduleRequest)) {
+        scheduleService.updateSchedule(id,scheduleRequest);
             responseData.setSuccess(Boolean.TRUE);
             status = HttpStatus.OK;
-            responseData.setMessage("Schedule updated successfully");
-
-        }
-        else{
-            responseData.setSuccess(Boolean.FALSE);
-            status = HttpStatus.NOT_FOUND;
-            responseData.setMessage("Schedule not updated successfully");
-        }
+            responseData.setMessage("Cập nhật lịch học thành công");
         return ResponseEntity.status(status).body(responseData);
     }
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<?> deleteCourse(@PathVariable int id) {
         ResponseData responseData = new ResponseData();
-        HttpStatus status = HttpStatus.OK;
-        if(scheduleService.deleteSchedule(id)) {
+        HttpStatus status ;
+        scheduleService.deleteSchedule(id);
             responseData.setSuccess(Boolean.TRUE);
             status = HttpStatus.OK;
-            responseData.setMessage("Schedule deleted successfully");
-        }
-        else{
-            responseData.setSuccess(Boolean.FALSE);
-            status = HttpStatus.NOT_FOUND;
-            responseData.setMessage("Schedule not deleted successfully");
-
-        }
+            responseData.setMessage("Xóa lịch học thành công");
         return ResponseEntity.status(status).body(responseData);
     }
 }

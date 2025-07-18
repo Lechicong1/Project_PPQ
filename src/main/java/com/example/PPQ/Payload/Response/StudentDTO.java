@@ -1,6 +1,6 @@
 package com.example.PPQ.Payload.Response;
 
-public class Student_response {
+public class StudentDTO {
     private String fullName;
     private int idUsers;
     private String phoneNumber;

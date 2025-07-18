@@ -22,18 +22,10 @@ public class RegisterController {
     public ResponseEntity<?> register(@Valid @RequestBody registerRequest registerRequest) {
         ResponseData responseData = new ResponseData();
         HttpStatus status ;
-            if(registerService.register(registerRequest)){
-                status= HttpStatus.OK;
-                responseData.setMessage("dang ki thanh cong");
-                responseData.setSuccess(Boolean.TRUE);
-
-            }
-            else{
-                status= HttpStatus.BAD_REQUEST;
-                responseData.setMessage("dang ki that bai");
-                responseData.setSuccess(Boolean.FALSE);
-
-            }
+            registerService.register(registerRequest);
+            status= HttpStatus.OK;
+            responseData.setMessage("Đăng ký thành công");
+            responseData.setSuccess(Boolean.TRUE);
         return ResponseEntity.status(status).body(responseData);
 
     }

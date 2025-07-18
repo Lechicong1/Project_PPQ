@@ -1,6 +1,6 @@
 package com.example.PPQ.Config;
 
-import com.example.PPQ.Entity.User_Entity;
+import com.example.PPQ.Entity.UserEntity;
 import com.example.PPQ.respository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
@@ -19,7 +19,7 @@ public class ApplicationConfig
     ApplicationRunner runner() {
         return args -> {
             if (user_repository.findByUsername("admin") == null) {
-                User_Entity user = new User_Entity();
+                UserEntity user = new UserEntity();
                 user.setUsername("admin");
                 user.setPassword(passwordEncoder.encode("admin"));
                 user.setIdRoles(16);

@@ -28,6 +28,15 @@ public class GlobalException {
         responseData.setData(null);
         return ResponseEntity.badRequest().body(responseData); // 400
     }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<?> handleUnknown(Exception e) {
+        System.out.println(e.getMessage());
+        ResponseData responseData = new ResponseData();
+        responseData.setSuccess(false);
+        responseData.setMessage(" Đã xảy ra lỗi hệ thống, vui lòng thử lại sau " );
+        responseData.setData(null);
+        return ResponseEntity.internalServerError().body(responseData);
+    }
     // Xảy ra khi parse dữ liệu từ url param bị lỗi
     @ExceptionHandler(value = MethodArgumentTypeMismatchException.class)
     public ResponseEntity<?> handleTypeMismatch(MethodArgumentTypeMismatchException e) {
@@ -87,9 +96,18 @@ public class GlobalException {
     public ResponseEntity<?> methodArgumentNotValidException(MethodArgumentNotValidException e) {
         ResponseData responseData = new ResponseData();
         responseData.setSuccess(false);
-        responseData.setMessage(e.getMessage());
+
+        // Lấy lỗi đầu tiên (thường đủ dùng)
+        String errorMessage = e.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .findFirst()
+                .map(fieldError -> fieldError.getDefaultMessage())
+                .orElse("Dữ liệu không hợp lệ");
+
+        responseData.setMessage(errorMessage); // Chỉ hiện message bạn đã ghi trong @Pattern
         responseData.setData(null);
-        return ResponseEntity.badRequest().body(responseData); // 400
+        return ResponseEntity.badRequest().body(responseData);
     }
 
     @ExceptionHandler(value = ForbiddenException.class)

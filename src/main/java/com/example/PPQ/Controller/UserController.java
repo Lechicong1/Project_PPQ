@@ -3,7 +3,7 @@ package com.example.PPQ.Controller;
 import com.example.PPQ.Payload.Request.UsersRequest;
 import com.example.PPQ.Payload.Request.changePasswordRequest;
 import com.example.PPQ.Payload.Response.ResponseData;
-import com.example.PPQ.Payload.Response.Users_response;
+import com.example.PPQ.Payload.Response.UserDTO;
 import com.example.PPQ.Service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,19 +25,10 @@ public class UserController {
     public ResponseEntity<?> getAllUsers(){
         ResponseData responseData = new ResponseData();
         HttpStatus status ;
-        List<Users_response> ListUsers=userService.getAllUsers();
-        if(!ListUsers.isEmpty()) {
+        List<UserDTO> ListUsers=userService.getAllUsers();
             responseData.setData(ListUsers);
             responseData.setSuccess(true);
             status = HttpStatus.OK;
-
-        }
-        else{
-            responseData.setData(null);
-            responseData.setSuccess(false);
-            status = HttpStatus.NOT_FOUND;
-
-        }
         return ResponseEntity.status(status).body(responseData);
     }
     @PreAuthorize("hasAuthority('STUDENT') or hasAuthority('TEACHER')")
@@ -45,87 +36,63 @@ public class UserController {
     public ResponseEntity<?> changePassword(@Valid @RequestBody changePasswordRequest changePasswordRequest){
         ResponseData responseData = new ResponseData();
         HttpStatus status ;
-        if(userService.changePassword(changePasswordRequest)) {
+            userService.changePassword(changePasswordRequest);
             responseData.setSuccess(true);
-
-            status = HttpStatus.CREATED;
+            status = HttpStatus.OK;
             responseData.setMessage("Đổi mật khẩu thành công");
 
-        }
-        else{
-            responseData.setSuccess(false);
-            status = HttpStatus.NOT_FOUND;
-        }
         return ResponseEntity.status(status).body(responseData);
     }
     @GetMapping("/roleTeacher")
     public ResponseEntity<?> getAllUsersRoleTeacher(){
         ResponseData responseData = new ResponseData();
         HttpStatus status ;
-        List<Users_response> ListUsers=userService.getAllUserByRoleTeacher() ;
-        if(!ListUsers.isEmpty()) {
+        List<UserDTO> ListUsers=userService.getAllUserByRoleTeacher() ;
             responseData.setData(ListUsers);
             responseData.setSuccess(true);
             status = HttpStatus.OK;
-        }
-        else{
-            responseData.setData(null);
-            responseData.setSuccess(false);
-            status = HttpStatus.NOT_FOUND;
-
-        }
         return ResponseEntity.status(status).body(responseData);
     }
     @PutMapping(value = "/{id}")
     public ResponseEntity<?> updateUser(@PathVariable int id ,@Valid @RequestBody UsersRequest usersRequest){
         ResponseData responseData = new ResponseData();
         HttpStatus status ;
-        if(userService.updateUsers(id,usersRequest)) {
-            responseData.setSuccess(true);
-            responseData.setData(usersRequest);
-            status = HttpStatus.OK;
-            responseData.setMessage("sua user thanh cong");
-        }
-        else{
-            responseData.setSuccess(false);
-            responseData.setMessage("sua user that bai ");
-            status = HttpStatus.NOT_FOUND;
-        }
+           userService.updateUsers(id,usersRequest);
+           responseData.setSuccess(true);
+           responseData.setData(usersRequest);
+           status = HttpStatus.OK;
+           responseData.setMessage("Sửa user thành công");
         return ResponseEntity.status(status).body(responseData);
     }
     @PostMapping
     public ResponseEntity<?> addUser(@Valid @RequestBody UsersRequest usersRequest){
         ResponseData responseData = new ResponseData();
         HttpStatus status ;
-        if(userService.addUsers(usersRequest)) {
+        userService.addUsers(usersRequest);
             responseData.setSuccess(true);
             responseData.setData(usersRequest);
             status = HttpStatus.CREATED;
-            responseData.setMessage("Thêm user thành công  ");
-
-        }
-        else{
-            responseData.setSuccess(false);
-            responseData.setMessage("Thêm User thất bại");
-            status = HttpStatus.NOT_FOUND;
-
-        }
+            responseData.setMessage("Thêm user thành công ");
         return ResponseEntity.status(status).body(responseData);
     }
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable int id){
         ResponseData responseData = new ResponseData();
         HttpStatus status ;
-        if(userService.deleteUsers(id)){
+        userService.deleteUsers(id);
             responseData.setSuccess(true);
-            responseData.setMessage("xoa user thanh cong");
+            responseData.setMessage("Xóa user thành công");
             status = HttpStatus.OK;
-        }
-        else{
-            responseData.setSuccess(false);
-            responseData.setMessage("xoa user that bai ");
-            status = HttpStatus.NOT_FOUND;
-        }
+        return ResponseEntity.status(status).body(responseData);
+    }
+    @GetMapping("/search")
+    public ResponseEntity<?> searchUserByUsernameAndRole(@RequestParam(required = false) String username, @RequestParam(required = false) Integer role){
+        ResponseData responseData = new ResponseData();
+        HttpStatus status ;
+        List<UserDTO> listUserDTO = userService.findUserByUsernameAndRole(username, role);
+        responseData.setData(listUserDTO);
+        responseData.setSuccess(true);
+        status = HttpStatus.OK;
         return ResponseEntity.status(status).body(responseData);
     }
 //    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")

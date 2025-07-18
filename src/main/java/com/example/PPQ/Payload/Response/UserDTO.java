@@ -1,6 +1,6 @@
 package com.example.PPQ.Payload.Response;
 
-public class Users_response {
+public class UserDTO {
     private String userName;
     private String roleName;
     private Integer userId;

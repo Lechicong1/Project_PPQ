@@ -2,7 +2,7 @@ package com.example.PPQ.Controller;
 
 import com.example.PPQ.Payload.Request.StudentRequest;
 import com.example.PPQ.Payload.Response.ResponseData;
-import com.example.PPQ.Payload.Response.Student_response;
+import com.example.PPQ.Payload.Response.StudentDTO;
 import com.example.PPQ.Service.StudentService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,19 +23,10 @@ public class StudentController {
     public ResponseEntity<?> getAllStudents() {
         ResponseData responseData = new ResponseData();
         HttpStatus status = HttpStatus.OK;
-        List<Student_response> student_dto=studentService.getAllStudents();
-        if(student_dto.size()>0) {
+        List<StudentDTO> student_dto=studentService.getAllStudents();
             responseData.setData(student_dto);
             responseData.setSuccess(Boolean.TRUE);
             status = HttpStatus.OK;
-            responseData.setMessage("All students successfully retrieved");
-
-        }
-        else{
-            responseData.setData(null);
-            responseData.setSuccess(Boolean.FALSE);
-            status = HttpStatus.NOT_FOUND;
-        }
         return ResponseEntity.status(status).body(responseData);
     }
     @PreAuthorize("hasAuthority('TEACHER')")
@@ -44,35 +35,22 @@ public class StudentController {
     public ResponseEntity<?> getStudentByClass(@RequestParam int classId) {
         ResponseData responseData = new ResponseData();
         HttpStatus status ;
-        List<Student_response> student_dto = studentService.getAllStudentByClass(classId);
-        if(student_dto!=null) {
+        List<StudentDTO> student_dto = studentService.getAllStudentByClass(classId);
             responseData.setData(student_dto);
             responseData.setSuccess(Boolean.TRUE);
             status = HttpStatus.OK;
-
-        }
-        else{
-            responseData.setData(null);
-            responseData.setSuccess(Boolean.FALSE);
-            status = HttpStatus.NOT_FOUND;
-        }
         return ResponseEntity.status(status).body(responseData);
     }
     @GetMapping("/search")
     public ResponseEntity<?> getStudentByName(@RequestParam(required = false ) String name,@RequestParam(required = false) String phoneNumber) {
         ResponseData responseData = new ResponseData();
         HttpStatus status ;
-        List<Student_response> student_dto = studentService.searchBynameAndPhoneNumber(name,phoneNumber);
-        if(student_dto!=null) {
+        List<StudentDTO> student_dto = studentService.searchBynameAndPhoneNumber(name,phoneNumber);
+
             responseData.setData(student_dto);
             responseData.setSuccess(Boolean.TRUE);
             status = HttpStatus.OK;
-        }
-        else{
-            responseData.setSuccess(Boolean.FALSE);
-            status = HttpStatus.NOT_FOUND;
-            responseData.setMessage("Không tìm thấy sinh viên !");
-        }
+
         return ResponseEntity.status(status).body(responseData);
     }
 
@@ -96,52 +74,30 @@ public class StudentController {
     public ResponseEntity<?> updateStudent(@PathVariable int id, @Valid @RequestBody StudentRequest studentRequest) {
         ResponseData responseData = new ResponseData();
         HttpStatus status = HttpStatus.OK;
-        if(studentService.updateStudent(id,studentRequest)) {
+        studentService.updateStudent(id,studentRequest);
             responseData.setSuccess(Boolean.TRUE);
             status = HttpStatus.OK;
-            responseData.setMessage("Student updated successfully");
-
-        }
-        else{
-            responseData.setSuccess(Boolean.FALSE);
-            status = HttpStatus.NOT_FOUND;
-            responseData.setMessage("Student not updated successfully");
-        }
+            responseData.setMessage("Cập nhật học sinh thành công");
         return ResponseEntity.status(status).body(responseData);
     }
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<?> deleteStudent(@PathVariable int id) {
         ResponseData responseData = new ResponseData();
         HttpStatus status = HttpStatus.OK;
-        if(studentService.deleteStudent(id)) {
+        studentService.deleteStudent(id);
             responseData.setSuccess(Boolean.TRUE);
             status = HttpStatus.OK;
-            responseData.setMessage("Student deleted successfully");
-        }
-        else{
-            responseData.setSuccess(Boolean.FALSE);
-            status = HttpStatus.NOT_FOUND;
-            responseData.setMessage("Student not deleted successfully");
-
-        }
+            responseData.setMessage("Xóa học sinh thành công");
         return ResponseEntity.status(status).body(responseData);
     }
     @GetMapping("/myInfo")
     public ResponseEntity<?> getStudentInfo() {
         ResponseData responseData = new ResponseData();
         HttpStatus status ;
-        Student_response student_dto = studentService.myInfo();
-        if(student_dto!=null) {
+        StudentDTO student_dto = studentService.myInfo();
             responseData.setData(student_dto);
             responseData.setSuccess(Boolean.TRUE);
             status = HttpStatus.OK;
-        }
-        else{
-            responseData.setSuccess(Boolean.FALSE);
-            status = HttpStatus.NOT_FOUND;
-            responseData.setMessage("Không tìm thấy sinh viên !");
-        }
         return ResponseEntity.status(status).body(responseData);
     }
-
 }

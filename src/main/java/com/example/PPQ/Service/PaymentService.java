@@ -15,11 +15,13 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 @Service
+@Transactional
 public class PaymentService implements PaymentServiceImp {
     @Autowired
     UsersRepository usersRepository;
@@ -48,7 +50,7 @@ public class PaymentService implements PaymentServiceImp {
         // Lấy user từ token hiện tại
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
-        User_Entity user = usersRepository.findByUsername(username);
+        UserEntity user = usersRepository.findByUsername(username);
         if (user == null) throw new ResourceNotFoundException("User không tồn tại");
         String qrContent = "PPQ" + user.getId()+idCourse;
         CourseEntity course = courseRespository.findById(idCourse).orElseThrow(()->new ResourceNotFoundException("Khóa học không tồn tại"));
@@ -64,7 +66,7 @@ public class PaymentService implements PaymentServiceImp {
         else {
             payment=new PaymentEntity();
             payment.setUserId(user.getId());
-            payment.setCourseId(course.getID());
+            payment.setCourseId(course.getId());
             payment.setClassId(paymentRequest.getClassId());
             payment.setFullName(paymentRequest.getFullName());
             payment.setPhoneNumber(paymentRequest.getPhoneNumber());
@@ -104,23 +106,21 @@ public class PaymentService implements PaymentServiceImp {
     }
 
     @Override
-    public boolean confirmPayment(PaymentRequest paymentRequest,int paymentId) {
+    public void confirmPayment(PaymentRequest paymentRequest,int paymentId) {
         // kiem tra xem student da ton tai chua (vi du user a muon dang ki them 1 khoa hoc thi khong can tao moi 1 student nua )
-        Student_Entity student_Entity = studentRespository.findByIdUsers(paymentRequest.getUserId());
+        StudentEntity student_Entity = studentRespository.findByIdUsers(paymentRequest.getUserId());
         //kiem tra xem lop hoc co ton tai hay khong
         ClassesEntity classes = classRespository.findById(paymentRequest.getClassId()).orElseThrow(()->new ResourceNotFoundException("Lớp học không tồn tại"));
         // kiem tra xem khoa hoc co ton tai khong
         CourseEntity course =courseRespository.findById(paymentRequest.getCourseId()).orElseThrow(()->new ResourceNotFoundException("Khóa học không tồn tại "));
         CourseStudentClassEntity course_StudentEntity = new CourseStudentClassEntity();
         if(student_Entity==null){ // them thong tin vao bang student
-            student_Entity=new Student_Entity();
+            student_Entity=new StudentEntity();
             student_Entity.setFullName(paymentRequest.getFullName());
             student_Entity.setPhoneNumber(paymentRequest.getPhoneNumber());
             student_Entity.setIdUsers(paymentRequest.getUserId());
             student_Entity.setId(paymentRequest.getUserId());
         }
-
-
         // luu thong tin vao bang chung
         course_StudentEntity.setIdCourse(paymentRequest.getCourseId());
         course_StudentEntity.setIdStudent(paymentRequest.getUserId());
@@ -129,23 +129,16 @@ public class PaymentService implements PaymentServiceImp {
         // thay doi status trong payment
         PaymentEntity payment=paymentRespository.findById(paymentId).orElseThrow(()->new ResourceNotFoundException("Bản thanh toán không tồn tại"));
         payment.setStatus("Đã thanh toán");
-        try{
             studentRespository.save(student_Entity);
             courseStudentClassRepository.save(course_StudentEntity);
             // sau khi dang ki khoa hoc thanh cong set role cua user do thanh student
-            Roles_Entity roleStudent=rolesRespository.findByRoleName("STUDENT");
-            User_Entity user= usersRepository.findById(paymentRequest.getUserId()).orElseThrow(()-> new ResourceNotFoundException("Không tồn tại user"));
+            RolesEntity roleStudent=rolesRespository.findByRoleName("STUDENT");
+            UserEntity user= usersRepository.findById(paymentRequest.getUserId()).orElseThrow(()-> new ResourceNotFoundException("Không tồn tại user"));
             user.setIdRoles(roleStudent.getId());
             usersRepository.save(user);
             paymentRespository.save(payment);
             classes.setCurrentStudents(classes.getCurrentStudents()+1);
             classRespository.save(classes);
-        return true;
-        }
-        catch(Exception e) {
-            System.out.println("co loi khi dang ki khoa hoc ");
-            return false;
-        }
     }
 
     @Override

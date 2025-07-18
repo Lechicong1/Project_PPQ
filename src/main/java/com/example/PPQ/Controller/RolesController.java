@@ -2,8 +2,8 @@ package com.example.PPQ.Controller;
 
 import com.example.PPQ.Payload.Request.RolesRequest;
 import com.example.PPQ.Payload.Response.ResponseData;
-import com.example.PPQ.Payload.Response.Roles_response;
-import com.example.PPQ.Service.Role_Service;
+import com.example.PPQ.Payload.Response.RolesDTO;
+import com.example.PPQ.Service.RolesService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,81 +18,47 @@ import java.util.List;
 @PreAuthorize("hasAuthority('ADMIN')")
 public class RolesController {
         @Autowired
-        Role_Service role_service;
+        RolesService role_service;
         @PostMapping
         public ResponseEntity<?> addRoles(@Valid @RequestBody RolesRequest role) {
             ResponseData responseData = new ResponseData();
             HttpStatus status ;
             System.out.println("rolename: "+role.getRoleName());
             System.out.println("description: "+role.getDescription());
-            if(role_service.addRoles(role)) {
-                responseData.setData("true");
-                responseData.setMessage("Them role thanh cong");
-                responseData.setSuccess(Boolean.TRUE);
-                status = HttpStatus.CREATED;   //201
-            }
-            else{
-                responseData.setData("false");
-                responseData.setMessage("Them role that bai");
-                responseData.setSuccess(Boolean.FALSE);
-                status = HttpStatus.BAD_REQUEST;
-            }
+            role_service.addRoles(role);
+            responseData.setMessage("Thêm Roles thành công");
+            responseData.setSuccess(Boolean.TRUE);
+            status = HttpStatus.CREATED;   //201
             return ResponseEntity.status(status).body(responseData);
         }
     @PutMapping(value = "/{id}")
     public ResponseEntity<?> updateRoles(@PathVariable int id, @Valid @RequestBody RolesRequest role) {
         ResponseData responseData = new ResponseData();
         HttpStatus status ;
-        if(role_service.updateRoles(id,role)) {
-            responseData.setData("true");
-            responseData.setMessage("sua role thanh cong");
-            responseData.setSuccess(Boolean.TRUE);
-            status = HttpStatus.OK;
-        }
-        else{
-            responseData.setData("false");
-            responseData.setMessage("sua role that bai");
-            responseData.setSuccess(Boolean.FALSE);
-            status = HttpStatus.NOT_FOUND;
-        }
+        role_service.updateRoles(id,role);
+        responseData.setMessage("Sửa Roles thành công");
+        responseData.setSuccess(Boolean.TRUE);
+        status = HttpStatus.OK;
         return ResponseEntity.status(status).body(responseData);
     }
     @DeleteMapping(value = "/{id}",produces = "application/json;charset=UTF-8")
     public ResponseEntity<?> deleteRoles(@PathVariable int id) {
         ResponseData responseData = new ResponseData();
         HttpStatus status ;
-        if(role_service.deleteRoles(id)) {
-            responseData.setData("true");
-            responseData.setMessage("xoa role thanh cong");
+        role_service.deleteRoles(id);
+            responseData.setMessage("Xóa Roles thành công");
             responseData.setSuccess(Boolean.TRUE);
             status = HttpStatus.OK;
-        }
-        else{
-            responseData.setData("false");
-            responseData.setMessage("xoa role that bai");
-            responseData.setSuccess(Boolean.FALSE);
-            status = HttpStatus.NOT_FOUND;
-        }
         return ResponseEntity.status(status).body(responseData);
     }
     @GetMapping
     public ResponseEntity<?> getAllRoles() {
         ResponseData responseData = new ResponseData();
         HttpStatus status ;
-        List<Roles_response> ListRoles=role_service.getAllRoles();
-        if(!ListRoles.isEmpty()) {
+        List<RolesDTO> ListRoles=role_service.getAllRoles();
             responseData.setData(ListRoles);
             responseData.setSuccess(true);
             status = HttpStatus.OK;
-
-        }
-        else{
-
-            responseData.setSuccess(false);
-            status = HttpStatus.NOT_FOUND;
-
-        }
-
         return ResponseEntity.status(status).contentType(MediaType.APPLICATION_JSON).body(responseData);
     }
 

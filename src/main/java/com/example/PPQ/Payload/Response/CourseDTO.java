@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public class Course_response {
+public class CourseDTO {
         private Integer id;
         private String nameCourse;
         private String Description;

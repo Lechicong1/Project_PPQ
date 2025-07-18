@@ -5,7 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface ClassRespository extends JpaRepository<ClassesEntity,Integer> {
@@ -14,4 +16,6 @@ public interface ClassRespository extends JpaRepository<ClassesEntity,Integer> {
     public List<ClassesEntity> findByIdCourses(int id);
     public List<ClassesEntity> findByIdTeachers(int id);
     public ClassesEntity findByClassName(String classname);
+
+    List<ClassesEntity> findAllByIdIn(Set<Integer> ids);
 }

@@ -1,18 +1,18 @@
 package com.example.PPQ.Service_Imp;
 
 import com.example.PPQ.Payload.Request.CourseRequest;
-import com.example.PPQ.Payload.Response.Course_response;
+import com.example.PPQ.Payload.Response.CourseDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface CourseServiceImp {
-    List<Course_response> getAllCourses();
-    Course_response getCourseByID(int id);
-    boolean addCourse(CourseRequest courseRequest, MultipartFile file);
-    boolean updateCourse(int id, CourseRequest courseRequest,MultipartFile file );
-    boolean deleteCourse(int id);
+    List<CourseDTO> getAllCourses();
+    CourseDTO getCourseByID(int id);
+    void addCourse(CourseRequest courseRequest, MultipartFile file);
+    void updateCourse(int id, CourseRequest courseRequest,MultipartFile file );
+    void deleteCourse(int id);
     List<String> getAllLanguages();
-    List<Course_response> getAllCoursesByLanguage(String language);
-    List<Course_response> getCourseByIdStudent();
+    List<CourseDTO> getAllCoursesByLanguage(String language);
+    List<CourseDTO> getCourseByIdStudent();
 }

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalTime;
 
-public class Schedule_response {
+public class ScheduleDTO {
     private Integer id;
     private String nameClass;
     private String nameRoom;

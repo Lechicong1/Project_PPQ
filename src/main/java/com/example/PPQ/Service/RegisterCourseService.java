@@ -35,19 +35,19 @@ public class RegisterCourseService implements RegisterCourseServiceImp {
         // luu thong tin user dang ki vao bang student , luu id_student va id_course vao bang trung gian
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
-        User_Entity user= UsersRepository.findByUsername(username);
+        UserEntity user= UsersRepository.findByUsername(username);
         if(user==null) {
             throw new ResourceNotFoundException("User không tồn tại");
         }
         // kiem tra xem student da ton tai chua (vi du user a muon dang ki them 1 khoa hoc thi khong can tao moi 1 student nua )
-        Student_Entity student_Entity = StudentRespository.findByIdUsers(user.getId());
+        StudentEntity student_Entity = StudentRespository.findByIdUsers(user.getId());
         //kiem tra xem lop hoc co ton tai hay khong
         ClassesEntity classes = classRepository.findById(RegisterCourseRequest.getIdClass()).orElseThrow(()->new ResourceNotFoundException("Lớp học không tồn tại"));
         // kiem tra xem khoa hoc co ton tai khong
         CourseEntity course =courseRespository.findById(id_course).orElseThrow(()->new ResourceNotFoundException("Khóa học không tồn tại "));
         CourseStudentClassEntity course_StudentEntity = new CourseStudentClassEntity();
         if(student_Entity==null){ // them thong tin vao bang student
-            student_Entity=new Student_Entity();    
+            student_Entity=new StudentEntity();
             student_Entity.setFullName(RegisterCourseRequest.getFullName());
             student_Entity.setPhoneNumber(RegisterCourseRequest.getPhoneNumber());
             student_Entity.setIdUsers(user.getId());
@@ -69,7 +69,7 @@ public class RegisterCourseService implements RegisterCourseServiceImp {
             StudentRespository.save(student_Entity);
             courseStudentRepository.save(course_StudentEntity);
             // sau khi dang ki khoa hoc thanh cong set role cua user do thanh student
-            Roles_Entity roleStudent=rolesRepository.findByRoleName("STUDENT");
+            RolesEntity roleStudent=rolesRepository.findByRoleName("STUDENT");
             user.setIdRoles(roleStudent.getId());
             UsersRepository.save(user);
             return true;
@@ -93,7 +93,7 @@ public class RegisterCourseService implements RegisterCourseServiceImp {
             courseRegisterRespone.setIdStudent(c.getIdStudent());
             courseRegisterRespone.setIdClass(c.getIdClass());
             courseRegisterRespone.setEnrollmentDate(c.getEnrollmentDate());
-            Student_Entity student =StudentRespository.findById(c.getIdStudent()).orElseThrow(()-> new ResourceNotFoundException("Không tìm thấy học sinh ")) ;
+            StudentEntity student =StudentRespository.findById(c.getIdStudent()).orElseThrow(()-> new ResourceNotFoundException("Không tìm thấy học sinh ")) ;
             courseRegisterRespone.setNameStudent(student.getFullName());
             CourseEntity course =courseRespository.findById(c.getIdCourse()).orElseThrow(()-> new ResourceNotFoundException("Không tìm thấy khóa học ")) ;
             courseRegisterRespone.setNameCourse(course.getNameCourse());
@@ -108,12 +108,12 @@ public class RegisterCourseService implements RegisterCourseServiceImp {
     public List<CourseRegisterRespone> searchCourseRegister(Integer idCourse, String nameStudent, Integer idClass) {
         List<CourseStudentClassEntity> courseregister = new ArrayList<>();
         if(nameStudent !=null) {
-            List<Student_Entity> listStudentSearchByName = StudentRespository.searchByName(nameStudent);
+            List<StudentEntity> listStudentSearchByName = StudentRespository.searchByName(nameStudent);
             if (listStudentSearchByName.size() == 0) {
                 throw new ResourceNotFoundException("không tồn tại học sinh ");
             }
 
-            for (Student_Entity s : listStudentSearchByName) {
+            for (StudentEntity s : listStudentSearchByName) {
                 List<CourseStudentClassEntity> temp = courseStudentRepository.searchCourseRegister(idCourse, s.getId(), idClass);
                 courseregister.addAll(temp);
             }
@@ -128,7 +128,7 @@ public class RegisterCourseService implements RegisterCourseServiceImp {
             courseRegisterRespone.setIdStudent(c.getIdStudent());
             courseRegisterRespone.setIdClass(c.getIdClass());
             courseRegisterRespone.setEnrollmentDate(c.getEnrollmentDate());
-            Student_Entity student =StudentRespository.findById(c.getIdStudent()).orElseThrow(()-> new ResourceNotFoundException("Không tìm thấy học sinh ")) ;
+            StudentEntity student =StudentRespository.findById(c.getIdStudent()).orElseThrow(()-> new ResourceNotFoundException("Không tìm thấy học sinh ")) ;
             courseRegisterRespone.setNameStudent(student.getFullName());
             CourseEntity course =courseRespository.findById(c.getIdCourse()).orElseThrow(()-> new ResourceNotFoundException("Không tìm thấy khóa học ")) ;
             courseRegisterRespone.setNameCourse(course.getNameCourse());

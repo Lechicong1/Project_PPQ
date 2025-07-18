@@ -1,16 +1,9 @@
-package com.example.PPQ.Entity;
+package com.example.PPQ.Payload.Response;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-
-@Entity
-@Table(name = "Roles")
-public class Roles_Entity {
-    @Id
+public class RolesDTO {
     private int id;
     private String roleName;
-    private String Description;
+    private String description;
 
     public int getId() {
         return id;
@@ -29,10 +22,10 @@ public class Roles_Entity {
     }
 
     public String getDescription() {
-        return Description;
+        return description;
     }
 
     public void setDescription(String description) {
-        Description = description;
+        this.description = description;
     }
 }

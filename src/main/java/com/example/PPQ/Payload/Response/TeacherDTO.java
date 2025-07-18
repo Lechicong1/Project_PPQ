@@ -1,33 +1,18 @@
-package com.example.PPQ.Entity;
+package com.example.PPQ.Payload.Response;
 
-import jakarta.persistence.*;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
-@Entity
-@Table(name = "Teacher")
-public class Teacher_Entity{
-    @Id
-    private int id;
+public class TeacherDTO {
+    private String educationLevel;
+    private String description;
+    private String userName;
     private String fullName;
     private String phoneNumber;
-    private String educationLevel;
-    @Column(columnDefinition = "LONGTEXT")
-    private String description;
-    private Integer idUsers;
+    private int id;
     private String email;
-    private String imagePath;
 //    private LocalDate startDate;
-
-
-//    public LocalDate getStartDate() {
-//        return startDate;
-//    }
-//
-//    public void setStartDate(LocalDate startDate) {
-//        this.startDate = startDate;
-//    }
+    private String imagePath;
+    public int getId() {
+        return id;
+    }
 
     public String getEmail() {
         return email;
@@ -37,16 +22,20 @@ public class Teacher_Entity{
         this.email = email;
     }
 
+//    public LocalDate getStartDate() {
+//        return startDate;
+//    }
+//
+//    public void setStartDate(LocalDate startDate) {
+//        this.startDate = startDate;
+//    }
+
     public String getImagePath() {
         return imagePath;
     }
 
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public void setId(int id) {
@@ -69,10 +58,6 @@ public class Teacher_Entity{
         this.phoneNumber = phoneNumber;
     }
 
-    public void setIdUsers(Integer idUsers) {
-        this.idUsers = idUsers;
-    }
-
     public String getEducationLevel() {
         return educationLevel;
     }
@@ -89,11 +74,11 @@ public class Teacher_Entity{
         this.description = description;
     }
 
-    public int getIdUsers() {
-        return idUsers;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setIdUsers(int idUsers) {
-        this.idUsers = idUsers;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

@@ -64,14 +64,8 @@ public class PaymentController {
 
         ResponseData responseData = new ResponseData();
         HttpStatus status = HttpStatus.OK;
-        if(paymentService.confirmPayment(paymentRequest, idPayment)){
-            responseData.setSuccess(Boolean.TRUE);
-
-        }
-        else{
-            responseData.setSuccess(Boolean.FALSE);
-            responseData.setMessage("Xác nhận thanh toán thất bại");
-        }
+        paymentService.confirmPayment(paymentRequest, idPayment);
+        responseData.setSuccess(Boolean.TRUE);
         return ResponseEntity.status(status).body(responseData);
     }
     @PreAuthorize("hasAuthority('ADMIN')")

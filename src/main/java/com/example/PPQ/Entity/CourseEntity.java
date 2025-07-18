@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 public class CourseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int ID;
+    private int id;
     private String nameCourse;
     @Column(columnDefinition = "LONGTEXT")
     private String Description;
@@ -27,12 +27,12 @@ public class CourseEntity {
         this.imagePath = imagePath;
     }
 
-    public int getID() {
-        return ID;
+    public int getId() {
+        return id;
     }
 
-    public void setID(int ID) {
-        this.ID = ID;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getNameCourse() {

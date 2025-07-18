@@ -9,6 +9,6 @@ import java.util.List;
 public interface PaymentServiceImp {
     Integer createPayment(PaymentRequest paymentRequest,int idCourse);
     QRRespone generateQr(int Paymentid);
-    boolean confirmPayment(PaymentRequest paymentRequest,int paymentId);
+    void confirmPayment(PaymentRequest paymentRequest,int paymentId);
     List<PaymentRespone> getAllPayments();
 }

@@ -4,7 +4,7 @@
 
     @Entity
     @Table(name = "Student")
-    public class Student_Entity {
+    public class StudentEntity {
         @Id
         private Integer id;
         private String fullName;

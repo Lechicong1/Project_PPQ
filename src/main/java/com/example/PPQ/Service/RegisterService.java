@@ -1,8 +1,7 @@
 package com.example.PPQ.Service;
 
-import com.example.PPQ.Entity.Roles_Entity;
-import com.example.PPQ.Entity.User_Entity;
-import com.example.PPQ.Exception.BusinessLogicException;
+import com.example.PPQ.Entity.RolesEntity;
+import com.example.PPQ.Entity.UserEntity;
 import com.example.PPQ.Exception.DuplicateResourceException;
 import com.example.PPQ.Exception.InvalidInputException;
 import com.example.PPQ.Exception.ResourceNotFoundException;
@@ -23,12 +22,9 @@ public class RegisterService implements RegisterImp {
     PasswordEncoder passwordEncoder;
 
     @Override
-    public boolean register(registerRequest request) {
-        System.out.println(request.getUsername());
-        System.out.println(request.getPassword());
-        System.out.println(request.getConfirmPassword());
-        User_Entity user = new User_Entity();
-        Roles_Entity role = roles_repository.findByRoleName("USER");
+    public void register(registerRequest request) {
+        UserEntity user = new UserEntity();
+        RolesEntity role = roles_repository.findByRoleName("USER");
         if(role==null)
             throw new ResourceNotFoundException("Roles USER không tồn tại");
         if(users_repository.existsByUsername(request.getUsername())){
@@ -38,13 +34,7 @@ public class RegisterService implements RegisterImp {
             user.setUsername(request.getUsername());
             user.setPassword(passwordEncoder.encode(request.getPassword()));
             user.setIdRoles(role.getId());
-            try {
-                users_repository.save(user);
-                return true;
-            } catch (Exception e) {
-                System.out.println("co loi khi dang ki " + e.getMessage());
-                return false;
-            }
+            users_repository.save(user);
         }
         else{
             throw new InvalidInputException("Mật khẩu xác nhận không trùng với mật khẩu trước đó ");

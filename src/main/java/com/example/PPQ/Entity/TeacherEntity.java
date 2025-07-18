@@ -1,28 +1,22 @@
-package com.example.PPQ.Payload.Response;
+package com.example.PPQ.Entity;
 
-import java.time.LocalDate;
+import jakarta.persistence.*;
 
-public class Teacher_response {
-    private String educationLevel;
-    private String description;
-    private String userName;
+@Entity
+@Table(name = "Teacher")
+public class TeacherEntity {
+    @Id
+    private int id;
     private String fullName;
     private String phoneNumber;
-    private int id;
+    private String educationLevel;
+    @Column(columnDefinition = "LONGTEXT")
+    private String description;
+    private Integer idUsers;
     private String email;
-//    private LocalDate startDate;
     private String imagePath;
-    public int getId() {
-        return id;
-    }
+//    private LocalDate startDate;
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
 
 //    public LocalDate getStartDate() {
 //        return startDate;
@@ -32,12 +26,24 @@ public class Teacher_response {
 //        this.startDate = startDate;
 //    }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public String getImagePath() {
         return imagePath;
     }
 
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public void setId(int id) {
@@ -60,6 +66,10 @@ public class Teacher_response {
         this.phoneNumber = phoneNumber;
     }
 
+    public void setIdUsers(Integer idUsers) {
+        this.idUsers = idUsers;
+    }
+
     public String getEducationLevel() {
         return educationLevel;
     }
@@ -76,11 +86,11 @@ public class Teacher_response {
         this.description = description;
     }
 
-    public String getUserName() {
-        return userName;
+    public int getIdUsers() {
+        return idUsers;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setIdUsers(int idUsers) {
+        this.idUsers = idUsers;
     }
 }

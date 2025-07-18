@@ -1,24 +1,18 @@
 package com.example.PPQ.Service;
 
-import com.example.PPQ.Entity.Roles_Entity;
-import com.example.PPQ.Entity.Teacher_Entity;
-import com.example.PPQ.Entity.User_Entity;
+import com.example.PPQ.Entity.*;
 import com.example.PPQ.Exception.BusinessLogicException;
 import com.example.PPQ.Exception.ResourceNotFoundException;
 import com.example.PPQ.Payload.Request.UsersRequest;
 import com.example.PPQ.Payload.Request.changePasswordRequest;
-import com.example.PPQ.Payload.Response.Users_response;
+import com.example.PPQ.Payload.Response.UserDTO;
 import com.example.PPQ.Service_Imp.UserServiceImp;
-import com.example.PPQ.respository.Roles_respository;
-import com.example.PPQ.respository.TeacherRespository;
-import com.example.PPQ.respository.UsersRepository;
-import jakarta.persistence.criteria.CriteriaBuilder;
+import com.example.PPQ.respository.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +22,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-    public class UserService implements UserServiceImp {
+@Transactional
+public class UserService implements UserServiceImp {
     @Autowired
     UsersRepository users_repository;
     @Autowired
@@ -37,98 +32,97 @@ import java.util.stream.Collectors;
     Roles_respository roles_repository;
     @Autowired
     TeacherRespository teachers_repository;
+    @Autowired
+    StudentRespository students_repository;
+    @Autowired
+    CourseStudentClassRepository courseStudentClassRepo;
     @Override
-    public List<Users_response> getAllUsers() {
-        List<User_Entity> users = users_repository.getAllUsersBasic();
-        Set<Integer> listIdRoles = users.stream().map(User_Entity::getIdRoles).collect(Collectors.toSet());
-        List<Roles_Entity> listRole = roles_repository.findAllByIdIn((listIdRoles));
-        Map<Integer,Roles_Entity> roleMap= listRole.stream().collect(Collectors.toMap(Roles_Entity::getId, Function.identity()));
-        List<Users_response> list = new ArrayList<>();
-        for (User_Entity user : users) {
-            Users_response userResponse = new Users_response();
+    public List<UserDTO> getAllUsers() {
+        List<UserEntity> users = users_repository.getAllUsersBasic();
+        Set<Integer> listIdRoles = users.stream().map(UserEntity::getIdRoles).collect(Collectors.toSet());
+        List<RolesEntity> listRole = roles_repository.findAllByIdIn((listIdRoles));
+        Map<Integer, RolesEntity> roleMap= listRole.stream().collect(Collectors.toMap(RolesEntity::getId, Function.identity()));
+        List<UserDTO> list = new ArrayList<>();
+        for (UserEntity user : users) {
+            UserDTO userResponse = new UserDTO();
             userResponse.setUserId(user.getId());
             userResponse.setUserName(user.getUsername());
-            Roles_Entity rolesEntity= roleMap.get(user.getIdRoles());
-            if (rolesEntity == null) {
-                throw new ResourceNotFoundException("Không tồn tại role cho user id: " + user.getId());
+            if(user.getIdRoles()==null)
+                userResponse.setRoleName(null);
+            else {
+                RolesEntity rolesEntity = roleMap.get(user.getIdRoles());
+                if (rolesEntity == null) {
+                    throw new ResourceNotFoundException("Không tồn tại role cho user id: " + user.getId());
+                }
+                //tra ve ten role thay vi id
+                userResponse.setRoleName(rolesEntity.getRoleName());
             }
-            //tra ve ten role thay vi id
-            userResponse.setRoleName(rolesEntity.getRoleName());
             list.add(userResponse);
         }
         return list;
     }
 
     @Override
-    public boolean deleteUsers(int id) {
-        if(!users_repository.existsById(id)){
+    public void deleteUsers(int id) {
+        if (!users_repository.existsById(id)) {
             throw new ResourceNotFoundException("User không tồn tại");
         }
-        try{
-            users_repository.deleteById(id);
-            return true;
+        // xoa iduser o bang student truoc
+        StudentEntity student = students_repository.findByIdUsers(id);
+        if(student!=null) {
+            List<CourseStudentClassEntity> courseStudent = courseStudentClassRepo.findByIdStudent(student.getId());
+            if (!courseStudent.isEmpty()){
+                courseStudentClassRepo.deleteAll(courseStudent); }
+                students_repository.deleteById(student.getId());
         }
-        catch(Exception e){
-            System.out.println("Có lỗi khi xóa user" + e.getMessage());
-            return false;
-        }
+        TeacherEntity teacher = teachers_repository.findByIdUsers(id);
+        if(teacher!=null)
+            teachers_repository.deleteById(teacher.getId());
+
+
+        users_repository.deleteById(id);
 
     }
-
+    @Transactional
     @Override
-    public boolean updateUsers(int id,UsersRequest usersRequest) {
-        User_Entity user = users_repository.findById(id).orElseThrow(()->new ResourceNotFoundException("User không tồn tại"));
-        try{
-           if(usersRequest.getPassWord()!=null){
-               user.setPassword(passwordEncoder.encode(usersRequest.getPassWord()));
-           }
+    public void updateUsers(int id,UsersRequest usersRequest) {
+        UserEntity user = users_repository.findById(id).orElseThrow(()->new ResourceNotFoundException("User không tồn tại"));
 
-           if(usersRequest.getIdRoles()!=null){
-               user.setIdRoles(usersRequest.getIdRoles());
-           }
+            if(usersRequest.getPassWord()!=null){
+                user.setPassword(passwordEncoder.encode(usersRequest.getPassWord()));
+            }
 
+            if(usersRequest.getIdRoles()!=null){
+                user.setIdRoles(usersRequest.getIdRoles());
+            }
             users_repository.save(user);
-            return true;
-        }
-        catch(Exception e){
-            System.out.println("Có lỗi khi sửa user " + e.getMessage());
-            return false;
-        }
-
     }
-
+    @Transactional
     @Override
-    public boolean addUsers(UsersRequest usersRequest) {
-        User_Entity user = new User_Entity();
+    public void addUsers(UsersRequest usersRequest) {
+        UserEntity user = new UserEntity();
         user.setIdRoles(usersRequest.getIdRoles());
         user.setUsername(usersRequest.getUserName());
         user.setPassword(passwordEncoder.encode(usersRequest.getPassWord()));
-        try{
-            users_repository.save(user);
-            return true;
-        }
-        catch(Exception e){
-            return false;
-        }
-
+        users_repository.save(user);
     }
 
     @Override
-    public List<Users_response> getAllUserByRoleTeacher() {
-        Roles_Entity role_teacher=roles_repository.findByRoleName("TEACHER");
+    public List<UserDTO> getAllUserByRoleTeacher() {
+        RolesEntity role_teacher=roles_repository.findByRoleName("TEACHER");
         if(role_teacher==null){
             throw new ResourceNotFoundException("Role Teacher không tồn tại");
         }
-        List<User_Entity> usersWithTeacherRole= users_repository.findByIdRoles(role_teacher.getId());
-        Set<Integer> idUser = usersWithTeacherRole.stream().map(User_Entity::getId).collect(Collectors.toSet());
-        List<Teacher_Entity> listTeacher = teachers_repository.findAllByIdUsersIn((idUser));
-        Map<Integer,Teacher_Entity> mapTeacher = listTeacher.stream().collect(Collectors.toMap(Teacher_Entity::getIdUsers, Function.identity()));
-        List<Users_response> list = new ArrayList<>();
-        for (User_Entity user : usersWithTeacherRole) {
+        List<UserEntity> usersWithTeacherRole= users_repository.findByIdRoles(role_teacher.getId());
+        Set<Integer> idUser = usersWithTeacherRole.stream().map(UserEntity::getId).collect(Collectors.toSet());
+        List<TeacherEntity> listTeacher = teachers_repository.findAllByIdUsersIn((idUser));
+        Map<Integer, TeacherEntity> mapTeacher = listTeacher.stream().collect(Collectors.toMap(TeacherEntity::getIdUsers, Function.identity()));
+        List<UserDTO> list = new ArrayList<>();
+        for (UserEntity user : usersWithTeacherRole) {
             // tim xem id_user da co trong bảng teacher chưa (nếu có rồi sẽ k hiện lên combobox nữa để tránh 2 giáo viên chung 1 id_user)
-            Teacher_Entity teacher=mapTeacher.get(user.getId());
+            TeacherEntity teacher=mapTeacher.get(user.getId());
             if(teacher!=null) continue;
-            Users_response userResponse = new Users_response();
+            UserDTO userResponse = new UserDTO();
             userResponse.setUserId(user.getId());
             userResponse.setUserName(user.getUsername());
             list.add(userResponse);
@@ -138,13 +132,12 @@ import java.util.stream.Collectors;
         }
         return list;
     }
-    @Autowired
-    RedisTemplate redisTemplate;
+    @Transactional
     @Override
-    public boolean changePassword(changePasswordRequest changePasswordRequest) {
+    public void changePassword(changePasswordRequest changePasswordRequest) {
         var context = SecurityContextHolder.getContext();  // lay thong tin user dang dang nhap tai contextholder
         String username = context.getAuthentication().getName();  // lay ra username
-        User_Entity users = users_repository.findByUsername(username);
+        UserEntity users = users_repository.findByUsername(username);
         if(users==null){
             throw new ResourceNotFoundException("User không tồn tại");
         }
@@ -153,14 +146,38 @@ import java.util.stream.Collectors;
             throw new BusinessLogicException("Mật khẩu cũ không đúng ");}
         if(passwordEncoder.matches(changePasswordRequest.getNewPassword(),users.getPassword() )){
             throw new BusinessLogicException("Mật khẩu mới không được trùng với mật khẩu cũ ");}
-        if(!changePasswordRequest.getNewPassword().matches(changePasswordRequest.getConfirmPassword())){
+        if(!changePasswordRequest.getNewPassword().equals(changePasswordRequest.getConfirmPassword())){
             throw new BusinessLogicException("Mật khẩu xác nhận không khớp với mật khẩu mới");
-            }
-
-
+        }
         users.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
         users_repository.save(users);
-        return true;
+
+    }
+
+    @Override
+    public List<UserDTO> findUserByUsernameAndRole(String username,Integer idRole) {
+        List<UserEntity> listuser = users_repository.findByUsernameAndRoles(username,idRole);
+        Set<Integer> listIdRoles = listuser.stream().map(UserEntity::getIdRoles).collect(Collectors.toSet());
+        List<RolesEntity> listRole = roles_repository.findAllByIdIn((listIdRoles));
+        Map<Integer, RolesEntity> roleMap= listRole.stream().collect(Collectors.toMap(RolesEntity::getId, Function.identity()));
+        List<UserDTO> list = new ArrayList<>();
+        for (UserEntity user : listuser) {
+            UserDTO userResponse = new UserDTO();
+            userResponse.setUserId(user.getId());
+            userResponse.setUserName(user.getUsername());
+            if(user.getIdRoles()==null)
+                userResponse.setRoleName(null);
+            else {
+                RolesEntity rolesEntity = roleMap.get(user.getIdRoles());
+                if (rolesEntity == null) {
+                    throw new ResourceNotFoundException("Không tồn tại role cho user id: " + user.getId());
+                }
+                //tra ve ten role thay vi id
+                userResponse.setRoleName(rolesEntity.getRoleName());
+            }
+            list.add(userResponse);
+        }
+        return list;
     }
 
 //    @Override

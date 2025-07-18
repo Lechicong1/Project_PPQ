@@ -1,10 +1,11 @@
 package com.example.PPQ.Entity;
 
 import jakarta.persistence.*;
+import jakarta.persistence.criteria.CriteriaBuilder;
 
 @Entity
 @Table(name = "Users")
-public class User_Entity {
+public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int ID;
@@ -12,11 +13,11 @@ public class User_Entity {
     private String password;
     private Integer idRoles;
 
-    public int getId() {
+    public Integer getId() {
         return ID;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.ID = id;
     }
 
@@ -36,7 +37,7 @@ public class User_Entity {
         this.password = password;
     }
 
-    public int getIdRoles() {
+    public Integer getIdRoles() {
         return idRoles;
     }
 

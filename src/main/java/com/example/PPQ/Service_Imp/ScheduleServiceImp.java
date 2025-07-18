@@ -1,18 +1,18 @@
 package com.example.PPQ.Service_Imp;
 
-import com.example.PPQ.Payload.Request.CourseRequest;
 import com.example.PPQ.Payload.Request.ScheduleRequest;
-import com.example.PPQ.Payload.Response.Course_response;
-import com.example.PPQ.Payload.Response.Schedule_response;
+import com.example.PPQ.Payload.Response.ScheduleDTO;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
 public interface ScheduleServiceImp {
-    List<Schedule_response> gettAllSchedule();
-    Schedule_response getScheduleById(int id);
-    boolean addSchedule(ScheduleRequest scheduleRequest);
-    boolean updateSchedule(int id, ScheduleRequest scheduleRequest);
-    boolean deleteSchedule(int id);
-    List<Schedule_response> getScheduleForStudent(String username);
-    List<Schedule_response> getScheduleForTeacher(String username);
+    List<ScheduleDTO> gettAllSchedule();
+    ScheduleDTO getScheduleById(int id);
+    void addSchedule(ScheduleRequest scheduleRequest);
+    void updateSchedule(int id, ScheduleRequest scheduleRequest);
+    void deleteSchedule(int id);
+    List<ScheduleDTO> getScheduleForStudent(String username);
+    List<ScheduleDTO> getScheduleForTeacher(String username);
+    List<ScheduleDTO> findScheduleByDayOfWeekAndClass(String dayOfWeek,Integer idClass);
 }

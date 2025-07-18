@@ -1,12 +1,10 @@
 package com.example.PPQ.Config;
 
-import com.example.PPQ.Entity.Roles_Entity;
-import com.example.PPQ.Entity.User_Entity;
+import com.example.PPQ.Entity.RolesEntity;
+import com.example.PPQ.Entity.UserEntity;
 import com.example.PPQ.respository.Roles_respository;
 import com.example.PPQ.respository.UsersRepository;
-import org.hibernate.annotations.Cache;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 import java.util.List;
 
 @Service
@@ -27,8 +24,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     RedisTemplate redisTemplate;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User_Entity user = usersRepo.findByUsername(username);
-        Roles_Entity rolesEntity=roles_respository.findById(user.getIdRoles()).orElseThrow(()->new UsernameNotFoundException("Không tồn tại roles"));
+        UserEntity user = usersRepo.findByUsername(username);
+        RolesEntity rolesEntity=roles_respository.findById(user.getIdRoles()).orElseThrow(()->new UsernameNotFoundException("Không tồn tại roles"));
         if(user == null) {
             throw new UsernameNotFoundException("Không tìm thấy username");
         }
