@@ -1,7 +1,9 @@
 package com.example.PPQ.Service;
 
 import com.example.PPQ.Entity.*;
+import com.example.PPQ.Exception.ForbiddenException;
 import com.example.PPQ.Exception.ResourceNotFoundException;
+import com.example.PPQ.Payload.Projection_Interface.StudentCoreView;
 import com.example.PPQ.Payload.Request.StudentRequest;
 import com.example.PPQ.Payload.Response.StudentDTO;
 import com.example.PPQ.Service_Imp.StudentServiceImp;
@@ -43,9 +45,19 @@ public class StudentService implements StudentServiceImp {
             std_dto.setId(s.getId());
             std_dto.setFullName(s.getFullName());
             std_dto.setPhoneNumber(s.getPhoneNumber());
+//            Float score1 = s.getScore1() == null ? 0f : s.getScore1();
+//            Float score2 = s.getScore2() == null ? 0f : s.getScore2();
+//            Float score3 = s.getScore3() == null ? 0f : s.getScore3();
+//            Float scoreHomework = s.getScoreHomework() == null ? 0f : s.getScoreHomework();
+//            std_dto.setScore1(score1);
+//            std_dto.setScore2(score2);
+//            std_dto.setScore3(score3);
+//            std_dto.setScoreHomework(scoreHomework);
+//            std_dto.setAbsentDays(s.getAbsentDays());
+//            std_dto.setAttentedDay(s.getAttentedDay());
+//            std_dto.setTotalScore(( score1 + score2 + score3 + scoreHomework) / 4);
             student_dto.add(std_dto);
         }
-
         return student_dto;
     }
 
@@ -53,9 +65,14 @@ public class StudentService implements StudentServiceImp {
     public StudentDTO getStudentById(int id) {
         StudentDTO std_dto=new StudentDTO();
         StudentEntity studentEntity=studentRespository.findById(id).orElseThrow(()->new ResourceNotFoundException("Học sinh không tồn tại"));
-        std_dto.setFullName(studentEntity.getFullName());
-        std_dto.setIdUsers(studentEntity.getIdUsers());
-        std_dto.setPhoneNumber(studentEntity.getPhoneNumber());
+//        std_dto.setFullName(studentEntity.getFullName());
+//        std_dto.setIdUsers(studentEntity.getIdUsers());
+//        std_dto.setPhoneNumber(studentEntity.getPhoneNumber());
+//        std_dto.setScore1(studentEntity.getScore1());
+//        std_dto.setScore2(studentEntity.getScore2());
+//        std_dto.setScore3(studentEntity.getScore3());
+//        std_dto.setScoreHomework(studentEntity.getScoreHomework());
+//        std_dto.setTotalScore((studentEntity.getScore1()+studentEntity.getScore2()+studentEntity.getScore3()+studentEntity.getScoreHomework())/4);
         return std_dto;
     }
 
@@ -88,65 +105,82 @@ public class StudentService implements StudentServiceImp {
     @Override
     public void updateStudent(int id,StudentRequest student) {
         StudentEntity studentEntity=studentRespository.findById(id).orElseThrow(()->new ResourceNotFoundException("User không tồn tại"));
-       if(student.getfullName()!=null){
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        String userNameRequest = usersRepository.findUserNameById(id);
+        if(!username.equals(userNameRequest)) {
+            throw new ForbiddenException("Bạn không được quyền chỉnh sửa học sinh này ");
+        }
+        if(student.getfullName()!=null){
            studentEntity.setFullName(student.getfullName());
        }
         if(student.getPhoneNumber()!=null){
             studentEntity.setPhoneNumber(student.getPhoneNumber());
         }
+//        if(student.getScore1()!=null){
+//            studentEntity.setScore1(studentEntity.getScore1());
+//        }
+//        if(student.getScore2()!=null){
+//            studentEntity.setScore2(student.getScore2());
+//        }
+//        if(student.getScore3()!=null){
+//            studentEntity.setScore3(student.getScore3());
+//        }
+//        if(student.getScoreHomework()!=null){
+//            studentEntity.setScoreHomework(student.getScoreHomework());
+//        }
+
             studentRespository.save(studentEntity);
     }
     @Transactional
     @Override
     public void deleteStudent(int id) {
-
             if (!studentRespository.existsById(id)) {
                 throw new ResourceNotFoundException("Không thể xóa !Học sinh không tồn tại");
             }
-            // xoa du lieu lien quan trong bang coursestudentclass truoc
-            List<CourseStudentClassEntity> listCourseStudentClass = courseStudentClassRepository.findByIdStudent(id);
-            // giam studentCurrent o bang class di 1 dua
-            Set<Integer> listIdClass = listCourseStudentClass.stream().map(CourseStudentClassEntity::getIdClass).collect(Collectors.toSet());
-            List<ClassesEntity> listClasses = classRespository.findAllByIdIn((listIdClass));
-            Map<Integer, ClassesEntity> mapClass = listClasses.stream().collect(Collectors.toMap(ClassesEntity::getId, Function.identity()));
-            for (CourseStudentClassEntity c : listCourseStudentClass) {
-                ClassesEntity classes = mapClass.get(c.getIdClass());
-                if (classes == null) {
-                    throw new ResourceNotFoundException("Class không tồn tại");
-                }
-                classes.setCurrentStudents(classes.getCurrentStudents() - 1);
-
-            }
-
-            if (!listCourseStudentClass.isEmpty()) {
-                courseStudentClassRepository.deleteAll(listCourseStudentClass);
-            }
-
+             // giảm studentCur ở bảng class đi 1 người
+            studentRespository.decreaseCurrentStudent(id);
+            // xóa student ở bảng trung gian
+            courseStudentClassRepository.deleteCourseStudentClassByIdStudent(id);
             studentRespository.deleteById(id);
-            //set role cua user do ve user
-            UserEntity userRoleStudent = usersRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Không tồn tại user"));
-            RolesEntity roleUser = rolesRespository.findByRoleName("USER");
-            userRoleStudent.setIdRoles(roleUser.getId());
-            usersRepository.save(userRoleStudent);
+
+           //set role từ student xuống user
+            usersRepository.setRolesUsers("USER",id);
+
 
     }
 
     @Override
     public List<StudentDTO> getAllStudentByClass(int class_id) {
-        List<CourseStudentClassEntity> student_class = courseStudentClassRepository.findByIdClass(class_id);
-
-        Set<Integer> studentIds = student_class.stream()
-                .map(CourseStudentClassEntity::getIdStudent)
-                .collect(Collectors.toSet());
-
-        List<StudentEntity> students = studentRespository.findAllByIdIn((studentIds));
+        List<StudentCoreView> students = studentRespository.findStudentByClassId(class_id);
+        if(students.isEmpty()) {
+            throw new ResourceNotFoundException("Học sinh không tồn tại");
+        }
         List<StudentDTO> listStudentDTO  = new ArrayList<>();
-        for(StudentEntity s:students){
+        for(StudentCoreView s:students){
             StudentDTO std_dto=new StudentDTO();
             std_dto.setId(s.getId());
             std_dto.setFullName(s.getFullName());
-            std_dto.setIdUsers(s.getIdUsers());
             std_dto.setPhoneNumber(s.getPhoneNumber());
+            Float score1 = s.getScore1() == null ? 0f : s.getScore1();
+            Float score2 = s.getScore2() == null ? 0f : s.getScore2();
+            Float score3 = s.getScore3() == null ? 0f : s.getScore3();
+            Integer absent = s.getAbsentDays() == null ? 0 : s.getAbsentDays();
+            Integer attented = s.getAttentedDay() == null ? 0 : s.getAttentedDay();
+            Float scoreHomework = s.getScoreHomework() == null ? 0f : s.getScoreHomework();
+            std_dto.setScore1(score1);
+            std_dto.setScore2(score2);
+            std_dto.setScore3(score3);
+            std_dto.setScoreHomework(scoreHomework);
+            std_dto.setAbsentDays(absent);
+            std_dto.setAttentedDay(attented);
+            Float totalScore = ( score1 + score2 + 2*score3 + scoreHomework) / 5f;
+            std_dto.setTotalScore(totalScore);
+            if(totalScore < 6  || absent > 4  ){
+                std_dto.setResult("fail");
+            }
+            else{
+                std_dto.setResult("pass");
+            }
             listStudentDTO.add(std_dto);
         }
         return listStudentDTO;
@@ -156,13 +190,26 @@ public class StudentService implements StudentServiceImp {
     public StudentDTO myInfo() {
         var context = SecurityContextHolder.getContext();  // lay thong tin user dang dang nhap tai contextholder
         String username = context.getAuthentication().getName();  // lay ra username
-        UserEntity users = usersRepository.findByUsername(username);
-       StudentEntity student = studentRespository.findById(users.getId()).orElseThrow(() -> new ResourceNotFoundException("Học sinh không tồn tại"));
-        StudentDTO student_dto = new StudentDTO();
-        student_dto.setId(student.getId());
-        student_dto.setPhoneNumber(student.getPhoneNumber());
-        student_dto.setFullName(student.getFullName());
-        return student_dto;
+       StudentEntity s = studentRespository.findByUserName(username);
+        if(s==null){
+            throw new ResourceNotFoundException("Học sinh không tồn tại");
+        }
+       StudentDTO std_dto = new StudentDTO();
+        std_dto.setId(s.getId());
+        std_dto.setPhoneNumber(s.getPhoneNumber());
+        std_dto.setFullName(s.getFullName());
+//        Float score1 = s.getScore1() == null ? 0f : s.getScore1();
+//        Float score2 = s.getScore2() == null ? 0f : s.getScore2();
+//        Float score3 = s.getScore3() == null ? 0f : s.getScore3();
+//        Float scoreHomework = s.getScoreHomework() == null ? 0f : s.getScoreHomework();
+//        std_dto.setScore1(score1);
+//        std_dto.setScore2(score2);
+//        std_dto.setScore3(score3);
+//        std_dto.setScoreHomework(scoreHomework);
+//        std_dto.setAbsentDays(s.getAbsentDays());
+//        std_dto.setAttentedDay(s.getAttentedDay());
+//        std_dto.setTotalScore(( score1 + score2 + score3 + scoreHomework) / 4);
+        return std_dto;
     }
 
 
@@ -177,6 +224,17 @@ public class StudentService implements StudentServiceImp {
             std_dto.setFullName(s.getFullName());
             std_dto.setId(s.getId());
             std_dto.setPhoneNumber(s.getPhoneNumber());
+//            Float score1 = s.getScore1() == null ? 0f : s.getScore1();
+//            Float score2 = s.getScore2() == null ? 0f : s.getScore2();
+//            Float score3 = s.getScore3() == null ? 0f : s.getScore3();
+//            Float scoreHomework = s.getScoreHomework() == null ? 0f : s.getScoreHomework();
+//            std_dto.setScore1(score1);
+//            std_dto.setScore2(score2);
+//            std_dto.setScore3(score3);
+//            std_dto.setScoreHomework(scoreHomework);
+//            std_dto.setAbsentDays(s.getAbsentDays());
+//            std_dto.setAttentedDay(s.getAttentedDay());
+//            std_dto.setTotalScore(( score1 + score2 + score3 + scoreHomework) / 4);
             student_dto.add(std_dto);
         }
 

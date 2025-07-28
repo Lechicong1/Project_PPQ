@@ -5,6 +5,7 @@ import com.example.PPQ.Exception.DuplicateResourceException;
 import com.example.PPQ.Exception.ResourceNotFoundException;
 import com.example.PPQ.Payload.Request.ClassRequest;
 import com.example.PPQ.Payload.Response.ClassDTO;
+import com.example.PPQ.Payload.Projection_Interface.ClassView;
 import com.example.PPQ.Service_Imp.ClassServiceImp;
 import com.example.PPQ.respository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -38,43 +37,17 @@ public class ClassService implements ClassServiceImp {
     @Override
     public List<ClassDTO> getAllClasses() {
         List<ClassDTO> list = new ArrayList<ClassDTO>();
-        List<ClassesEntity> listclass=classRepository.findAll();
-        Set<Integer> listIdTeacher = listclass.stream().map(ClassesEntity::getIdTeachers).collect(Collectors.toSet());
-        List<TeacherEntity> listTeacher=TeacherRepository.findAllByIdIn(listIdTeacher);
-        Map<Integer,TeacherEntity> mapTeacher=listTeacher.stream().collect(Collectors.toMap(TeacherEntity::getId, Function.identity()));
-        Set<Integer> listIdCourse = listclass.stream().map(ClassesEntity::getIdCourses).collect(Collectors.toSet());
-        List<CourseEntity> listCourse=courseRespository.findAllByIdIn(listIdCourse);
-        Map<Integer,CourseEntity> mapCourse=listCourse.stream().collect(Collectors.toMap(CourseEntity::getId, Function.identity()));
-
-        for(ClassesEntity c:listclass){
+        List<ClassView> listclassView=classRepository.findAllClass();
+        for(ClassView c:listclassView){
             ClassDTO class_dto=new ClassDTO();
             class_dto.setId(c.getId());
-            class_dto.setClassName(c.getClassName());
+            class_dto.setClassName(c.getNameClass());
             class_dto.setStatus(c.getStatus());
             class_dto.setCurrentStudents(c.getCurrentStudents());
-            if(c.getIdTeachers()==null)
-            class_dto.setIdTeachers(-1);
-            else
-                class_dto.setIdTeachers(c.getIdTeachers());
-            if(c.getIdTeachers()!=null){
-            TeacherEntity teacher=mapTeacher.get(c.getIdTeachers());
-            if(teacher==null)
-              throw new ResourceNotFoundException("Giáo viên không tồn tại") ;
-            class_dto.setNameTeacher(teacher.getFullName()); }
-            if(c.getIdCourses()==null)
-            class_dto.setIdCourses(-1);
-             else
-                 class_dto.setIdCourses(c.getIdCourses());
-            // tra ve ten khoa hoc
-            if(c.getIdCourses()!=null){
-                CourseEntity course =mapCourse.get(c.getIdCourses());
-                if(course==null)
-                    throw new ResourceNotFoundException("Khóa học không tồn tại");
-            class_dto.setNameCourse(course.getNameCourse());
-            }
-
+            class_dto.setNameTeacher(c.getNameTeacher());
+            class_dto.setNameCourse(c.getNameCourse());
             class_dto.setMaxStudents(c.getMaxStudents());
-
+            class_dto.setRoadMap(c.getRoadMap());
             list.add(class_dto);
         }
         return list;
@@ -84,42 +57,20 @@ public class ClassService implements ClassServiceImp {
     public List<ClassDTO> getClassByIdTeacher() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username=auth.getName();
-        UserEntity user=usersRepository.findByUsername(username);
-        if(user==null){
-            throw new ResourceNotFoundException("Không tồn tại User");
-        }
-        TeacherEntity teacher=TeacherRepository.findById(user.getId()).orElseThrow(()->new ResourceNotFoundException("Giáo viên không tồn tại"));
-        List<ClassesEntity> class_entity=classRepository.findByIdTeachers(teacher.getId());
+        TeacherEntity teacher=TeacherRepository.findByUserName(username);
+         if(teacher==null) throw  new ResourceNotFoundException("Giáo viên không tồn tại");
+        List<ClassView> classViews=classRepository.findByIdTeachers(teacher.getId());
+        if(classViews.isEmpty())
+            throw new ResourceNotFoundException("Giáo viên chưa có lớp học nào");
         List<ClassDTO> list = new ArrayList<ClassDTO>();
-        Set<Integer> listIdTeacher = class_entity.stream().map(ClassesEntity::getIdTeachers).collect(Collectors.toSet());
-        List<TeacherEntity> listTeacher=TeacherRepository.findAllByIdIn(listIdTeacher);
-        Map<Integer,TeacherEntity> mapTeacher=listTeacher.stream().collect(Collectors.toMap(TeacherEntity::getId, Function.identity()));
-        Set<Integer> listIdCourse = class_entity.stream().map(ClassesEntity::getIdCourses).collect(Collectors.toSet());
-        List<CourseEntity> listCourse=courseRespository.findAllByIdIn(listIdCourse);
-        Map<Integer,CourseEntity> mapCourse=listCourse.stream().collect(Collectors.toMap(CourseEntity::getId, Function.identity()));
-        for(ClassesEntity c:class_entity){
+        for(ClassView c:classViews){
             ClassDTO class_dto=new ClassDTO();
             class_dto.setId(c.getId());
-            class_dto.setClassName(c.getClassName());
+            class_dto.setClassName(c.getNameClass());
             class_dto.setStatus(c.getStatus());
             class_dto.setCurrentStudents(c.getCurrentStudents());
-            if(c.getIdTeachers()==null)
-                class_dto.setIdTeachers(-1);
-            else
-                class_dto.setIdTeachers(c.getIdTeachers());
-            if(c.getIdTeachers()!=null){
-                class_dto.setNameTeacher(teacher.getFullName()); }
-            if(c.getIdCourses()==null)
-                class_dto.setIdCourses(-1);
-            else
-                class_dto.setIdCourses(c.getIdCourses());
-            // tra ve ten khoa hoc
-            if(c.getIdCourses()!=null){
-                CourseEntity course =mapCourse.get(c.getIdCourses());
-                if(course==null)
-                    throw new ResourceNotFoundException("Khóa học không tồn tại");
-                class_dto.setNameCourse(course.getNameCourse());
-            }
+            class_dto.setNameTeacher(c.getNameTeacher());
+            class_dto.setNameCourse(c.getNameCourse());
             class_dto.setMaxStudents(c.getMaxStudents());
             list.add(class_dto);
         }
@@ -143,7 +94,7 @@ public class ClassService implements ClassServiceImp {
         c.setMaxStudents(classRequest.getMaxStudents());
         c.setIdTeachers(classRequest.getIdTeachers());
         c.setStatus(classRequest.getStatus());
-
+        c.setRoadMap(classRequest.getRoadMap());
         classRepository.save(c);
 
     }
@@ -166,6 +117,9 @@ public class ClassService implements ClassServiceImp {
        if(classRequest.getStatus()!=null){
            classes.setStatus(classRequest.getStatus());
        }
+       if(classRequest.getRoadMap()!=null){
+           classes.setRoadMap(classRequest.getRoadMap());
+       }
        classRepository.save(classes);
     }
 
@@ -175,16 +129,9 @@ public class ClassService implements ClassServiceImp {
         if(!classRepository.existsById(id)){
             throw new ResourceNotFoundException("Lớp học không tồn tại");
         }
-        List<ScheduleEntity> schedule =scheduleRespository.findByIdClass(id);
-        if(schedule.size()>0){
-            scheduleRespository.deleteAll(schedule);
-        }
+        scheduleRespository.deleteByIdClass(id);
         //xoa idclass o bang coursestudentclass
-        List<CourseStudentClassEntity> courseclass = courseStudentClassRepository.findByIdClass(id);
-        if(courseclass.size()>0){
-            courseStudentClassRepository.deleteAll(courseclass);
-        }
-
+        courseStudentClassRepository.deleteCourseStudentClassByIdClass(id);
         classRepository.deleteById(id);
     }
 

@@ -2,19 +2,19 @@ package com.example.PPQ.Entity;
 
 import jakarta.persistence.*;
 
-@Entity
-@Table(name = "Teacher")
-public class TeacherEntity {
-    @Id
-    private int id;
-    private String fullName;
-    private String phoneNumber;
-    private String educationLevel;
-    @Column(columnDefinition = "LONGTEXT")
-    private String description;
-    private Integer idUsers;
-    private String email;
-    private String imagePath;
+    @Entity
+    @Table(name = "Teacher")
+    public class TeacherEntity {
+        @Id
+        private int id;
+        private String fullName;
+        private String phoneNumber;
+        private String educationLevel;
+        @Column(columnDefinition = "LONGTEXT")
+        private String description;
+        private Integer idUsers;
+        private String email;
+        private String imagePath;
 //    private LocalDate startDate;
 
 

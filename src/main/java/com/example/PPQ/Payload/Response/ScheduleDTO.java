@@ -13,6 +13,17 @@ public class ScheduleDTO {
     private String thu;
     private Integer idClass;
     private String nameCourse;
+    public ScheduleDTO() {}
+        public ScheduleDTO(Integer id,Integer idClass,  String nameRoom,String thu,  LocalTime startTime, LocalTime endTime,String nameClass,  String nameCourse) {
+            this.id = id;
+            this.nameClass = nameClass;
+            this.nameRoom = nameRoom;
+            this.startTime = startTime;
+            this.endTime = endTime;
+            this.thu = thu;
+            this.idClass = idClass;
+            this.nameCourse = nameCourse;
+        }
 
     public String getNameCourse() {
         return nameCourse;

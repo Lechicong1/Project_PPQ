@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @Component
 public class JwtCustom {
 
-    @Value("${security.authentication.jwt.token-validity-in-seconds}")
+    @Value("${spring.security.authentication.jwt.token-validity-in-seconds}")
     private long tokenValidityInSeconds;
     public static final MacAlgorithm JWT_ALGORITHM = MacAlgorithm.HS512;
 
@@ -32,10 +32,15 @@ public class JwtCustom {
         Instant now = Instant.now();
         Instant validity=now.plus(tokenValidityInSeconds, ChronoUnit.SECONDS);
         // Lấy danh sách quyền (authorities)
-        List<String> authorities = authentication.getAuthorities()
-                .stream()
+        List<String> authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
+                .map(role -> role
+                        .replaceFirst("^SCOPE_", "")        // bỏ tiền tố SCOPE_
+                        .replaceFirst("^OAUTH2_", "")       // bỏ tiền tố OAUTH2_
+                        .replaceFirst("^ROLE_", "")         // tùy chọn: nếu bạn không muốn ROLE_
+                )
                 .collect(Collectors.toList());
+
 
         JwtClaimsSet claims=JwtClaimsSet.builder()
                 .issuedAt(now)

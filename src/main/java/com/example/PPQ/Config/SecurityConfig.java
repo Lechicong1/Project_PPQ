@@ -1,8 +1,10 @@
 package com.example.PPQ.Config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -13,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -31,11 +34,16 @@ public class SecurityConfig {
     JwtDecoder jwtDecoder;
     @Autowired
     JwtAuthenticationConverter jwtAuthenticationConverter;
-
+    @Autowired
+    oauth2Config oauth2Config;
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+    @Autowired
+    oauth2Config successHandler;
+    @Autowired
+    BearerTokenResolver bearerTokenResolver;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -45,19 +53,28 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // ✅ Cho phép preflight CORS
-                        .requestMatchers("/login","/register","courses/{courseId}").permitAll()
-                            .requestMatchers("/upload/**","/contact","/courses/languages").permitAll()
+                        .requestMatchers("/login","/register","courses/{courseId}","/logout").permitAll()
+                        .requestMatchers("/upload/**","/contact","/courses/languages").permitAll()
                          .requestMatchers(HttpMethod.GET, "/courses").permitAll()
                         .requestMatchers(HttpMethod.GET, "/teachers").permitAll()
 
                         .anyRequest().authenticated()
                 )
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt
-                                .decoder(jwtDecoder) // gọi hàm JwtDecoder đã khai báo @Bean
-                                .jwtAuthenticationConverter(jwtAuthenticationConverter) // gọi hàm phân quyền
-                        )
-                );
+                    .oauth2ResourceServer(oauth2 -> oauth2
+                            .jwt(jwt -> jwt
+                                    .decoder(jwtDecoder) // gọi hàm JwtDecoder đã khai báo @Bean
+                                    .jwtAuthenticationConverter(jwtAuthenticationConverter) // gọi hàm phân quyền
+                            )
+                            .bearerTokenResolver(bearerTokenResolver) // 🔑 lấy token từ cookie
+                    )
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/oauth2/authorization/google")
+                        .successHandler(successHandler)  // custom xử lý sau khi đăng nhập thành công
+
+        )
+                .logout(logout -> logout.disable());
+
+        
 
         return http.build();
     }
@@ -66,7 +83,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of("*")); // ✅ Cho tất cả domain, phù hợp cho máy ảo, máy thật
+        config.setAllowedOrigins(List.of("http://localhost:5500")); // hoặc 127.0.0.1 nếu dùng IP
+        // ✅ Cho tất cả domain, phù hợp cho máy ảo, máy thật
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true); // ✅ Cho phép gửi token/cookie

@@ -11,9 +11,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
@@ -31,7 +34,15 @@ public class UserController {
             status = HttpStatus.OK;
         return ResponseEntity.status(status).body(responseData);
     }
-    @PreAuthorize("hasAuthority('STUDENT') or hasAuthority('TEACHER')")
+    @PreAuthorize("hasAnyAuthority('STUDENT','TEACHER','ADMIN','USER')")
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(Map.of(
+                "username", jwt.getSubject(),
+                "authorities", jwt.getClaimAsStringList("authorities")
+        ));
+    }
+    @PreAuthorize("hasAnyAuthority('STUDENT','TEACHER')")
     @PostMapping("/changePassword")
     public ResponseEntity<?> changePassword(@Valid @RequestBody changePasswordRequest changePasswordRequest){
         ResponseData responseData = new ResponseData();
@@ -95,23 +106,6 @@ public class UserController {
         status = HttpStatus.OK;
         return ResponseEntity.status(status).body(responseData);
     }
-//    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
-//    @GetMapping("/myInfo")
-//    public ResponseEntity<?> getMyInfo(){
-//        ResponseData responseData = new ResponseData();
-//        HttpStatus status ;
-//        Users_response usersResponse=userService.myInfo();
-//        if(usersResponse!=null){
-//            responseData.setData(usersResponse);
-//            responseData.setSuccess(true);
-//            status = HttpStatus.OK;
-//        }
-//        else{
-//            responseData.setSuccess(false);
-//            responseData.setSuccess(false);
-//            status = HttpStatus.NOT_FOUND;
-//        }
-//        return ResponseEntity.status(status).body(responseData);
-//    }
+
 
 }

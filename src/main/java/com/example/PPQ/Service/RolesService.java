@@ -18,7 +18,7 @@ import java.util.List;
 @Transactional
 public class RolesService implements RoleService {
     @Autowired
-    Roles_respository respository;
+    Roles_respository roleRepo;
     @Autowired
     UsersRepository usersRepository;
     @Override
@@ -26,29 +26,22 @@ public class RolesService implements RoleService {
         RolesEntity roles = new RolesEntity();
         roles.setRoleName(RolesRequest.getRoleName());
         roles.setDescription(RolesRequest.getDescription());
-        respository.save(roles);
+        roleRepo.save(roles);
     }
 
     @Override
     public void deleteRoles(int id) {
-        if (!respository.existsById(id)) {
+        if (!roleRepo.existsById(id)) {
               throw new ResourceNotFoundException("Role không tồn tại ");
         }
         // vi roles_id la khoa ngoai trong bang user nen can xoa trong bang user truoc moi xoa duoc trong bang role
-        List<UserEntity> users=usersRepository.findByIdRoles(id);
-        if(!users.isEmpty()) {
-          for(UserEntity user:users) {
-              user.setIdRoles(null);
-          }
-          usersRepository.saveAll(users);
-        }
-        respository.deleteById(id);
-
+        usersRepository.removeUserRole(id);
+        roleRepo.deleteById(id);
     }
 
     @Override
     public void updateRoles(int id,RolesRequest RolesRequest) {
-        RolesEntity roles = respository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User không tồn tại"));
+        RolesEntity roles = roleRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User không tồn tại"));
 
             if(RolesRequest.getRoleName()!=null){
                 roles.setRoleName(RolesRequest.getRoleName());
@@ -56,12 +49,12 @@ public class RolesService implements RoleService {
             if(RolesRequest.getDescription()!=null){
                 roles.setDescription(RolesRequest.getDescription());
             }
-            respository.save(roles);
+        roleRepo.save(roles);
     }
 
     @Override
     public List<RolesDTO> getAllRoles() {
-        List<RolesEntity> roles = respository.findAll();
+        List<RolesEntity> roles = roleRepo.findAll();
         if(roles.isEmpty())
             throw new ResourceNotFoundException("Role không tồn tại");
         List<RolesDTO> roles_response = new ArrayList<RolesDTO>();

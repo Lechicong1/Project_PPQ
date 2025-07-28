@@ -14,7 +14,16 @@ public class ClassesEntity {
     private Integer maxStudents;
     private int currentStudents=0;
     private String status;
+    @Column(columnDefinition = "LONGTEXT")
+    private String roadMap;
 
+    public String getRoadMap() {
+        return roadMap;
+    }
+
+    public void setRoadMap(String roadMap) {
+        this.roadMap = roadMap;
+    }
 
     public Integer getId() {
         return id;

@@ -87,7 +87,6 @@ public class PaymentService implements PaymentServiceImp {
     }
     public QRRespone generateQr(int paymentId) {
         PaymentEntity payment = paymentRespository.findById(paymentId).orElseThrow(()->new ResourceNotFoundException("Không tồn tại bản thanh toán"));
-
         // Tạo QR
         String qrUrl = VietQRUtil.generateVietQRUrl(
                 bankCode, accountNumber, accountName,
@@ -99,7 +98,7 @@ public class PaymentService implements PaymentServiceImp {
         response.setQrContent(payment.getQrContent());
         response.setAmount(payment.getAmount());
         response.setBankCode(bankCode);
-        response.setBankName("TPBank"); // hardcode hoặc lấy từ map bankCode → tên
+        response.setBankName("MBBank"); // hardcode hoặc lấy từ map bankCode → tên
         response.setAccountNumber(accountNumber);
         response.setAccountName(accountName);
         return response;

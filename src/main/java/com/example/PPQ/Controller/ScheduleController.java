@@ -68,6 +68,7 @@ public class ScheduleController {
             status = HttpStatus.OK;
         return ResponseEntity.status(status).body(responseData);
     }
+    @PreAuthorize("hasAuthority('TEACHER')")
     @GetMapping("/myScheduleTeacher")
     public ResponseEntity<?> getScheduleForTeacher(){
         ResponseData responseData = new ResponseData();
@@ -80,6 +81,7 @@ public class ScheduleController {
             status = HttpStatus.OK;
         return ResponseEntity.status(status).body(responseData);
     }
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping
     public ResponseEntity<?> addSchedule( @Valid @RequestBody ScheduleRequest scheduleRequest) {
         ResponseData responseData = new ResponseData();
@@ -90,6 +92,7 @@ public class ScheduleController {
             responseData.setMessage("Thêm lịch học thành công ");
         return ResponseEntity.status(status).body(responseData);
     }
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping(value = "/{id}")
     public ResponseEntity<?> updateSchedule(@PathVariable int id,@Valid @RequestBody ScheduleRequest scheduleRequest) {
         ResponseData responseData = new ResponseData();
@@ -100,6 +103,7 @@ public class ScheduleController {
             responseData.setMessage("Cập nhật lịch học thành công");
         return ResponseEntity.status(status).body(responseData);
     }
+    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<?> deleteCourse(@PathVariable int id) {
         ResponseData responseData = new ResponseData();

@@ -92,7 +92,7 @@ public class CourseController {
         responseData.setMessage("Thêm khóa học thành công");
         return ResponseEntity.status(status).body(responseData);
     }
-
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping(value = "/{id}")
     public ResponseEntity<?> updateCourse(@PathVariable int id, @Valid @RequestPart("courseRequestStr") String courseRequestStr, @RequestPart(value = "file", required = false) MultipartFile file) {
         ResponseData responseData = new ResponseData();
@@ -112,7 +112,7 @@ public class CourseController {
         responseData.setMessage("Cập nhật khóa học thành công");
         return ResponseEntity.status(status).body(responseData);
     }
-
+    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<?> deleteCourse(@PathVariable int id) {
         ResponseData responseData = new ResponseData();

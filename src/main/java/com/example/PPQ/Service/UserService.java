@@ -3,6 +3,7 @@ package com.example.PPQ.Service;
 import com.example.PPQ.Entity.*;
 import com.example.PPQ.Exception.BusinessLogicException;
 import com.example.PPQ.Exception.ResourceNotFoundException;
+import com.example.PPQ.Payload.Projection_Interface.UserView;
 import com.example.PPQ.Payload.Request.UsersRequest;
 import com.example.PPQ.Payload.Request.changePasswordRequest;
 import com.example.PPQ.Payload.Response.UserDTO;
@@ -38,25 +39,13 @@ public class UserService implements UserServiceImp {
     CourseStudentClassRepository courseStudentClassRepo;
     @Override
     public List<UserDTO> getAllUsers() {
-        List<UserEntity> users = users_repository.getAllUsersBasic();
-        Set<Integer> listIdRoles = users.stream().map(UserEntity::getIdRoles).collect(Collectors.toSet());
-        List<RolesEntity> listRole = roles_repository.findAllByIdIn((listIdRoles));
-        Map<Integer, RolesEntity> roleMap= listRole.stream().collect(Collectors.toMap(RolesEntity::getId, Function.identity()));
+        List<UserView> users = users_repository.getAllUsersBasic();
         List<UserDTO> list = new ArrayList<>();
-        for (UserEntity user : users) {
+        for (UserView user : users) {
             UserDTO userResponse = new UserDTO();
             userResponse.setUserId(user.getId());
-            userResponse.setUserName(user.getUsername());
-            if(user.getIdRoles()==null)
-                userResponse.setRoleName(null);
-            else {
-                RolesEntity rolesEntity = roleMap.get(user.getIdRoles());
-                if (rolesEntity == null) {
-                    throw new ResourceNotFoundException("Không tồn tại role cho user id: " + user.getId());
-                }
-                //tra ve ten role thay vi id
-                userResponse.setRoleName(rolesEntity.getRoleName());
-            }
+            userResponse.setUserName(user.getUserName());
+            userResponse.setRoleName(user.getRoleName());
             list.add(userResponse);
         }
         return list;
@@ -70,16 +59,10 @@ public class UserService implements UserServiceImp {
         // xoa iduser o bang student truoc
         StudentEntity student = students_repository.findByIdUsers(id);
         if(student!=null) {
-            List<CourseStudentClassEntity> courseStudent = courseStudentClassRepo.findByIdStudent(student.getId());
-            if (!courseStudent.isEmpty()){
-                courseStudentClassRepo.deleteAll(courseStudent); }
-                students_repository.deleteById(student.getId());
+            courseStudentClassRepo.deleteCourseStudentClassByIdStudent(student.getId());
+            students_repository.deleteById(student.getId());
         }
-        TeacherEntity teacher = teachers_repository.findByIdUsers(id);
-        if(teacher!=null)
-            teachers_repository.deleteById(teacher.getId());
-
-
+        teachers_repository.deleteTeacherByIdUsers(id);
         users_repository.deleteById(id);
 
     }
@@ -114,6 +97,9 @@ public class UserService implements UserServiceImp {
             throw new ResourceNotFoundException("Role Teacher không tồn tại");
         }
         List<UserEntity> usersWithTeacherRole= users_repository.findByIdRoles(role_teacher.getId());
+        if(usersWithTeacherRole.isEmpty()){
+            throw new ResourceNotFoundException("Không tồn tại user có role giáo viên ");
+        }
         Set<Integer> idUser = usersWithTeacherRole.stream().map(UserEntity::getId).collect(Collectors.toSet());
         List<TeacherEntity> listTeacher = teachers_repository.findAllByIdUsersIn((idUser));
         Map<Integer, TeacherEntity> mapTeacher = listTeacher.stream().collect(Collectors.toMap(TeacherEntity::getIdUsers, Function.identity()));
@@ -126,9 +112,6 @@ public class UserService implements UserServiceImp {
             userResponse.setUserId(user.getId());
             userResponse.setUserName(user.getUsername());
             list.add(userResponse);
-        }
-        if(list.isEmpty()){
-            throw new ResourceNotFoundException("Không tồn tại user có role giáo viên ");
         }
         return list;
     }
@@ -151,30 +134,17 @@ public class UserService implements UserServiceImp {
         }
         users.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
         users_repository.save(users);
-
     }
-
     @Override
+
     public List<UserDTO> findUserByUsernameAndRole(String username,Integer idRole) {
-        List<UserEntity> listuser = users_repository.findByUsernameAndRoles(username,idRole);
-        Set<Integer> listIdRoles = listuser.stream().map(UserEntity::getIdRoles).collect(Collectors.toSet());
-        List<RolesEntity> listRole = roles_repository.findAllByIdIn((listIdRoles));
-        Map<Integer, RolesEntity> roleMap= listRole.stream().collect(Collectors.toMap(RolesEntity::getId, Function.identity()));
+        List<UserView> listuser = users_repository.findByUsernameAndRoles(username,idRole);
         List<UserDTO> list = new ArrayList<>();
-        for (UserEntity user : listuser) {
+        for (UserView user : listuser) {
             UserDTO userResponse = new UserDTO();
             userResponse.setUserId(user.getId());
-            userResponse.setUserName(user.getUsername());
-            if(user.getIdRoles()==null)
-                userResponse.setRoleName(null);
-            else {
-                RolesEntity rolesEntity = roleMap.get(user.getIdRoles());
-                if (rolesEntity == null) {
-                    throw new ResourceNotFoundException("Không tồn tại role cho user id: " + user.getId());
-                }
-                //tra ve ten role thay vi id
-                userResponse.setRoleName(rolesEntity.getRoleName());
-            }
+            userResponse.setUserName(user.getUserName());
+            userResponse.setRoleName(user.getRoleName());
             list.add(userResponse);
         }
         return list;

@@ -5,10 +5,10 @@ import com.example.PPQ.Exception.BusinessLogicException;
 import com.example.PPQ.Exception.ResourceNotFoundException;
 import com.example.PPQ.Payload.Request.ScheduleRequest;
 import com.example.PPQ.Payload.Response.ScheduleDTO;
+import com.example.PPQ.Payload.Projection_Interface.ScheduleView;
 import com.example.PPQ.Service_Imp.ScheduleServiceImp;
 import com.example.PPQ.respository.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,22 +37,16 @@ public class ScheduleService implements ScheduleServiceImp {
     @Override
     public List<ScheduleDTO> gettAllSchedule() {
         List<ScheduleDTO> listSchedule_dto = new ArrayList<>();
-        List<ScheduleEntity> schedule=scheduleRespository.findAll();
-        Set<Integer> ListClassId = schedule.stream().map(ScheduleEntity::getIdClass).collect(Collectors.toSet());
-        List<ClassesEntity> listClasses=classRespository.findAllByIdIn(ListClassId);
-        Map<Integer,ClassesEntity> mapClasses = listClasses.stream().collect(Collectors.toMap(ClassesEntity::getId, Function.identity()));
+        List<ScheduleView> schedule=scheduleRespository.findScheduleAll();
         if(schedule.isEmpty())
             throw new ResourceNotFoundException("Không tồn tại lịch học");
-        for(ScheduleEntity sc:schedule){
+        for(ScheduleView sc:schedule){
             ScheduleDTO schedule_dto=new ScheduleDTO();
             schedule_dto.setIdClass(sc.getIdClass());
             schedule_dto.setId(sc.getId());
             schedule_dto.setStartTime(sc.getStartTime());
             schedule_dto.setEndTime(sc.getEndTime());
-            ClassesEntity classes =mapClasses.get(schedule_dto.getIdClass());
-            if(classes==null)
-                throw new ResourceNotFoundException("Lớp học không tồn tại ");
-            schedule_dto.setNameClass(classes.getClassName());
+            schedule_dto.setNameClass(sc.getNameClass());
             schedule_dto.setThu(sc.getThu());
             schedule_dto.setNameRoom(sc.getNameRoom());
             listSchedule_dto.add(schedule_dto);
@@ -138,122 +132,72 @@ public class ScheduleService implements ScheduleServiceImp {
         }
         scheduleRespository.deleteById(id);
     }
-    @Cacheable(value = "scheduleForStudent", key = "#username", sync = true)
+//    @Cacheable(value = "scheduleForStudent", key = "#username", sync = true)
     @Override
     public List<ScheduleDTO> getScheduleForStudent(String username) {
-
-        UserEntity user=UsersRepository.findByUsername(username);
-        if(user==null){
-            throw new ResourceNotFoundException("Không tồn tại User");
+        StudentEntity student = studentRespository.findByUserName(username);
+        if(student==null){
+            throw new ResourceNotFoundException("Học sinh không tồn tại");
         }
-        StudentEntity student = studentRespository.findById(user.getId()).orElseThrow(()->new ResourceNotFoundException("Học sinh không tồn tại")) ;
-        List<CourseStudentClassEntity> courseStudentClassEntities=courseStudentClassRepository.findByIdStudent(student.getId());
-        if(courseStudentClassEntities.isEmpty()){
-            throw new ResourceNotFoundException("Khóa học này chưa có sinh viên đăng kí ");
+        List<ScheduleView> scheduleViews = scheduleRespository.findByStudent(student.getId());
+        if(scheduleViews.isEmpty())
+            throw new ResourceNotFoundException("Không tồn tại lịch học");
+        List<ScheduleDTO> list=new ArrayList<>();
+        for(ScheduleView s:scheduleViews){
+            ScheduleDTO scheduleDTO=new ScheduleDTO();
+            scheduleDTO.setId(s.getId());
+            scheduleDTO.setThu(s.getThu());
+            scheduleDTO.setNameRoom(s.getNameRoom());
+            scheduleDTO.setStartTime(s.getStartTime());
+            scheduleDTO.setEndTime(s.getEndTime());
+            scheduleDTO.setIdClass(s.getIdClass());
+            scheduleDTO.setNameClass(s.getNameClass());
+            scheduleDTO.setNameCourse(s.getNameCourse());
+            list.add(scheduleDTO);
         }
-        List<Integer> listIdClass = courseStudentClassEntities.stream().map(CourseStudentClassEntity::getIdClass).collect(Collectors.toList());
-        List<ScheduleEntity> AllSchedule=scheduleRespository.findByIdClassIn(listIdClass);
-        List<ClassesEntity> listClasses=classRespository.findAllById(listIdClass);
-        Map<Integer,ClassesEntity> mapClasses = listClasses.stream().collect(Collectors.toMap(ClassesEntity::getId, Function.identity()));
-        List<Integer> listIdcourse =listClasses.stream().map(ClassesEntity::getIdCourses).collect(Collectors.toList());
-        List<CourseEntity> listCourses = courseRespository.findAllById(listIdcourse);
-        Map<Integer, CourseEntity> mapCourses = listCourses.stream()
-                .collect(Collectors.toMap(CourseEntity::getId, Function.identity()));
-        List<ScheduleDTO> listSchedule_dto=new ArrayList<>();
-        for(ScheduleEntity y : AllSchedule){
-            ScheduleDTO schedule_dto=new ScheduleDTO();
-            schedule_dto.setIdClass(y.getIdClass());
-            schedule_dto.setStartTime(y.getStartTime());
-            schedule_dto.setEndTime(y.getEndTime());
-            ClassesEntity classesEntity=mapClasses.get(schedule_dto.getIdClass());
-            if (classesEntity == null) {
-                throw new ResourceNotFoundException("Lớp học không tồn tại ");
-            }
-            schedule_dto.setNameClass(classesEntity.getClassName());
-            schedule_dto.setThu(y.getThu());
-            schedule_dto.setNameRoom(y.getNameRoom());
-            schedule_dto.setId(y.getId());
-            CourseEntity courseEntity =mapCourses.get(classesEntity.getIdCourses());
-            if (courseEntity == null) {
-                throw new ResourceNotFoundException("Khóa học không tồn tại ");
-            }
-            schedule_dto.setNameCourse(courseEntity.getNameCourse());
-
-            listSchedule_dto.add(schedule_dto);
-        }
-        return listSchedule_dto;
+        return list;
     }
-    @Cacheable(value = "scheduleForTeacherDTO", key = "#username", sync = true)
-
+//    @Cacheable(value = "scheduleForTeacherDTO", key = "#username", sync = true)
     // value la ten vung nho trong cache , key la ten con ben trong vung nho value
         @Override
         public List<ScheduleDTO> getScheduleForTeacher(String username) {
-            List<ScheduleDTO> listSchedule_dto=new ArrayList<>();
-               UserEntity user=UsersRepository.findByUsername(username);
-               if(user==null){
-                   throw new ResourceNotFoundException("Không tồn tại User");
-               }
-               TeacherEntity teacher=teacherRespository.findById(user.getId()).orElseThrow(()->new ResourceNotFoundException("Giáo viên không tồn tại"));
-               List<ClassesEntity> listClasses=classRespository.findByIdTeachers(teacher.getId());
-               if(listClasses==null){
-                   throw new ResourceNotFoundException("không tìm thấy lớp có giáo viên " +teacher.getFullName() +" dạy");
-               }
-               List<Integer> listClassId =listClasses.stream().map(ClassesEntity::getId).toList();
-               // tim tat ca lich hoc co classid trong listClassId
-               List<ScheduleEntity> listSchedule = scheduleRespository.findByIdClassIn(listClassId);
-               Map<Integer,ClassesEntity> mapClasses = listClasses.stream().collect(Collectors.toMap(ClassesEntity::getId, Function.identity()));
-               // lay cac idcourse tu class
-                List<Integer> listCourseId = listClasses.stream().map(ClassesEntity::getIdCourses).toList();
-                List<CourseEntity> listCourses = courseRespository.findAllById(listCourseId);
-                 Map<Integer, CourseEntity> mapCourses = listCourses.stream()
-                .collect(Collectors.toMap(CourseEntity::getId, Function.identity()));
+               TeacherEntity teacher=teacherRespository.findByUserName(username);
+                     if(teacher ==null ) throw new ResourceNotFoundException("Giáo viên không tồn tại");
+            List<ScheduleView> scheduleViews = scheduleRespository.findByTeacher(teacher.getId());
+            if(scheduleViews.isEmpty())
+                throw new ResourceNotFoundException("Không tồn tại lịch học");
+            List<ScheduleDTO> list=new ArrayList<>();
+            for(ScheduleView s:scheduleViews){
+                ScheduleDTO scheduleDTO=new ScheduleDTO();
+                scheduleDTO.setId(s.getId());
+                scheduleDTO.setThu(s.getThu());
+                scheduleDTO.setNameRoom(s.getNameRoom());
+                scheduleDTO.setStartTime(s.getStartTime());
+                scheduleDTO.setEndTime(s.getEndTime());
+                scheduleDTO.setIdClass(s.getIdClass());
+                scheduleDTO.setNameClass(s.getNameClass());
+                scheduleDTO.setNameCourse(s.getNameCourse());
+                list.add(scheduleDTO);
+            }
+            return list;
 
-            for(ScheduleEntity y : listSchedule) {
-                   ScheduleDTO schedule_dto = new ScheduleDTO();
-                   schedule_dto.setIdClass(y.getIdClass());
-                   schedule_dto.setStartTime(y.getStartTime());
-                   schedule_dto.setEndTime(y.getEndTime());
-                   ClassesEntity classes = mapClasses.get(y.getIdClass());
-                   if (classes == null) {
-                      throw new ResourceNotFoundException("Lớp học không tồn tại ");
-                              }
-                   schedule_dto.setNameClass(classes.getClassName());
-
-                   schedule_dto.setThu(y.getThu());
-                   schedule_dto.setNameRoom(y.getNameRoom());
-                   schedule_dto.setId(y.getId());
-                  CourseEntity course = mapCourses.get(classes.getIdCourses());
-                  if (course == null) {
-                      throw new ResourceNotFoundException("Khóa học không tồn tại ");
-                              }
-                  schedule_dto.setNameCourse(course.getNameCourse());
-
-            listSchedule_dto.add(schedule_dto);
-               }
-            return listSchedule_dto;
         }
 
     @Override
     public List<ScheduleDTO> findScheduleByDayOfWeekAndClass(String thu, Integer idClass) {
         List<ScheduleDTO> listSchedule_dto = new ArrayList<>();
-        List<ScheduleEntity> schedule=scheduleRespository.findScheduleByThuAndIdClass(thu, idClass);
+        List<ScheduleView> schedule=scheduleRespository.findScheduleByThuAndIdClass(thu, idClass);
         if(schedule.isEmpty()){
             throw new ResourceNotFoundException("Không tồn tại lịch học");
         }
-        Set<Integer> ListClassId = schedule.stream().map(ScheduleEntity::getIdClass).collect(Collectors.toSet());
-        List<ClassesEntity> listClasses=classRespository.findAllByIdIn(ListClassId);
-        Map<Integer,ClassesEntity> mapClasses = listClasses.stream().collect(Collectors.toMap(ClassesEntity::getId, Function.identity()));
 
-        for(ScheduleEntity sc:schedule){
+        for(ScheduleView sc:schedule){
             ScheduleDTO schedule_dto=new ScheduleDTO();
             schedule_dto.setIdClass(sc.getIdClass());
             schedule_dto.setId(sc.getId());
             schedule_dto.setStartTime(sc.getStartTime());
             schedule_dto.setEndTime(sc.getEndTime());
-            ClassesEntity classes =mapClasses.get(schedule_dto.getIdClass());
-            if(classes==null)
-                throw new ResourceNotFoundException("Lớp học không tồn tại ");
-            schedule_dto.setNameClass(classes.getClassName());
+            schedule_dto.setNameClass(sc.getNameClass());
             schedule_dto.setThu(sc.getThu());
             schedule_dto.setNameRoom(sc.getNameRoom());
             listSchedule_dto.add(schedule_dto);

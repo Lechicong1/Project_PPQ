@@ -4,6 +4,7 @@ import com.example.PPQ.Payload.Response.ResponseData;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -109,7 +110,14 @@ public class GlobalException {
         responseData.setData(null);
         return ResponseEntity.badRequest().body(responseData);
     }
-
+    @ExceptionHandler(value = AccessDeniedException.class)
+    public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException e) {
+        ResponseData responseData = new ResponseData();
+        responseData.setSuccess(false);
+        responseData.setMessage("Bạn không có quyền truy cập chức năng này.");
+        responseData.setData(null);
+        return ResponseEntity.status(403).body(responseData);
+    }
     @ExceptionHandler(value = ForbiddenException.class)
     public ResponseEntity<?> forbiddenException(ForbiddenException e) {
         ResponseData responseData = new ResponseData();

@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/students")
-//@PreAuthorize("hasAuthority('ADMIN')")
+@PreAuthorize("hasAuthority('ADMIN')")
 public class StudentController {
     @Autowired
     StudentService studentService;
@@ -70,6 +70,7 @@ public class StudentController {
 //        }
 //        return ResponseEntity.status(status).body(responseData);
 //    }
+    @PreAuthorize("hasAnyAuthority('STUDENT','ADMIN')")
     @PutMapping(value = "/{id}")
     public ResponseEntity<?> updateStudent(@PathVariable int id, @Valid @RequestBody StudentRequest studentRequest) {
         ResponseData responseData = new ResponseData();
@@ -90,6 +91,7 @@ public class StudentController {
             responseData.setMessage("Xóa học sinh thành công");
         return ResponseEntity.status(status).body(responseData);
     }
+    @PreAuthorize("hasAuthority('STUDENT')")
     @GetMapping("/myInfo")
     public ResponseEntity<?> getStudentInfo() {
         ResponseData responseData = new ResponseData();

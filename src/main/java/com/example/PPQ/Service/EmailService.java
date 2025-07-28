@@ -27,7 +27,7 @@ public class EmailService implements EmailServiceImp {
 
             // Setting up necessary details
             mailMessage.setFrom(sender);
-            mailMessage.setTo("lechicong9a2@gmail.com");
+            mailMessage.setTo("Phuonglee.cv@gmail.com");
             mailMessage.setSubject("Liên hệ từ người dùng: Tư vấn khóa học");
             mailMessage.setText(
                     "Họ tên: " + contact.getName() + "\n" +

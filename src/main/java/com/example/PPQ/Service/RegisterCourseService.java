@@ -5,6 +5,7 @@ import com.example.PPQ.Exception.DuplicateResourceException;
 import com.example.PPQ.Exception.ResourceNotFoundException;
 import com.example.PPQ.Payload.Request.RegisterCourseRequest;
 import com.example.PPQ.Payload.Response.CourseRegisterRespone;
+import com.example.PPQ.Payload.Projection_Interface.CourseRegisterView;
 import com.example.PPQ.Service_Imp.RegisterCourseServiceImp;
 import com.example.PPQ.respository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,22 +84,14 @@ public class RegisterCourseService implements RegisterCourseServiceImp {
 
     @Override
     public List<CourseRegisterRespone> getAllCourseRegister() {
-        List<CourseStudentClassEntity> courserregister = courseStudentRepository.findAll();
+        List<CourseRegisterView> courseRegisterViews = courseStudentRepository.findAllCourseRegister();
         List<CourseRegisterRespone> courseRegisterRespones = new ArrayList<>();
-        for(CourseStudentClassEntity c:courserregister){
-            System.out.println("id class " + c.getIdClass());
-            System.out.println("id course " + c.getIdCourse());
+        for(CourseRegisterView c:courseRegisterViews){
             CourseRegisterRespone courseRegisterRespone = new CourseRegisterRespone();
-            courseRegisterRespone.setIdCourse(c.getIdCourse());
-            courseRegisterRespone.setIdStudent(c.getIdStudent());
-            courseRegisterRespone.setIdClass(c.getIdClass());
             courseRegisterRespone.setEnrollmentDate(c.getEnrollmentDate());
-            StudentEntity student =StudentRespository.findById(c.getIdStudent()).orElseThrow(()-> new ResourceNotFoundException("Không tìm thấy học sinh ")) ;
-            courseRegisterRespone.setNameStudent(student.getFullName());
-            CourseEntity course =courseRespository.findById(c.getIdCourse()).orElseThrow(()-> new ResourceNotFoundException("Không tìm thấy khóa học ")) ;
-            courseRegisterRespone.setNameCourse(course.getNameCourse());
-            ClassesEntity classes =classRepository.findById(c.getIdClass()).orElseThrow(()-> new ResourceNotFoundException("Không tìm thấy lớp học  ")) ;
-            courseRegisterRespone.setNameClass(classes.getClassName());
+            courseRegisterRespone.setNameStudent(c.getFullName());
+            courseRegisterRespone.setNameCourse(c.getNameCourse());
+            courseRegisterRespone.setNameClass(c.getNameClass());
             courseRegisterRespones.add(courseRegisterRespone);
         }
         return courseRegisterRespones;
@@ -106,34 +99,14 @@ public class RegisterCourseService implements RegisterCourseServiceImp {
 
     @Override
     public List<CourseRegisterRespone> searchCourseRegister(Integer idCourse, String nameStudent, Integer idClass) {
-        List<CourseStudentClassEntity> courseregister = new ArrayList<>();
-        if(nameStudent !=null) {
-            List<StudentEntity> listStudentSearchByName = StudentRespository.searchByName(nameStudent);
-            if (listStudentSearchByName.size() == 0) {
-                throw new ResourceNotFoundException("không tồn tại học sinh ");
-            }
-
-            for (StudentEntity s : listStudentSearchByName) {
-                List<CourseStudentClassEntity> temp = courseStudentRepository.searchCourseRegister(idCourse, s.getId(), idClass);
-                courseregister.addAll(temp);
-            }
-        }
-        else{
-            courseregister = courseStudentRepository.searchCourseRegister(idCourse, null, idClass);
-        }
+        List<CourseRegisterView> courseRegisterViews = courseStudentRepository.searchCourseRegister(idCourse,nameStudent,idClass);
         List<CourseRegisterRespone> courseRegisterRespones = new ArrayList<>();
-        for(CourseStudentClassEntity c:courseregister){
+        for(CourseRegisterView c:courseRegisterViews){
             CourseRegisterRespone courseRegisterRespone = new CourseRegisterRespone();
-            courseRegisterRespone.setIdCourse(c.getIdCourse());
-            courseRegisterRespone.setIdStudent(c.getIdStudent());
-            courseRegisterRespone.setIdClass(c.getIdClass());
             courseRegisterRespone.setEnrollmentDate(c.getEnrollmentDate());
-            StudentEntity student =StudentRespository.findById(c.getIdStudent()).orElseThrow(()-> new ResourceNotFoundException("Không tìm thấy học sinh ")) ;
-            courseRegisterRespone.setNameStudent(student.getFullName());
-            CourseEntity course =courseRespository.findById(c.getIdCourse()).orElseThrow(()-> new ResourceNotFoundException("Không tìm thấy khóa học ")) ;
-            courseRegisterRespone.setNameCourse(course.getNameCourse());
-            ClassesEntity classes =classRepository.findById(c.getIdClass()).orElseThrow(()-> new ResourceNotFoundException("Không tìm thấy lớp học ")) ;
-            courseRegisterRespone.setNameClass(classes.getClassName());
+            courseRegisterRespone.setNameStudent(c.getFullName());
+            courseRegisterRespone.setNameCourse(c.getNameCourse());
+            courseRegisterRespone.setNameClass(c.getNameClass());
             courseRegisterRespones.add(courseRegisterRespone);
         }
         return courseRegisterRespones;

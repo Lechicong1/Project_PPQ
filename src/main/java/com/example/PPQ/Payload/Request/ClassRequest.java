@@ -17,8 +17,15 @@ public class ClassRequest {
     @Positive(message = "Số lượng học sinh phải lớn hơn 0")
     private Integer maxStudents;
     private String status;
+    private String roadMap;
 
+    public String getRoadMap() {
+        return roadMap;
+    }
 
+    public void setRoadMap(String roadMap) {
+        this.roadMap = roadMap;
+    }
 
     public String getClassName() {
         return className;

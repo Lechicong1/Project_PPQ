@@ -1,6 +1,7 @@
 package com.example.PPQ.respository;
 
 import com.example.PPQ.Entity.CourseEntity;
+import com.example.PPQ.Payload.Projection_Interface.CourseView;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -13,6 +14,19 @@ public interface CourseRespository extends JpaRepository<CourseEntity,Integer> {
     @Query("SELECT DISTINCT c.language FROM CourseEntity c")
     List<String> getAllLanguages();
     List<CourseEntity> findByLanguage(String language);
-
     List<CourseEntity> findAllByIdIn(Set<Integer> listIdCourse);
+    @Query(value = "select " +
+            "            c.nameCourse as nameCourse, " +
+            "            cl.className as nameClass, " +
+            "            csc.enrollmentDate as enrollmentDate, " +
+            "            c.Fee as fee, " +
+            "            c.numberSessions as numberSessions, " +
+            "            sc.score1,sc.score2,sc.score3,sc.scoreHomework, " +
+            "            sc.attentedDay,sc.absentDays " +
+            "            from Course c " +
+            "            inner join CourseStudentClass csc on csc.idCourse = c.ID " +
+            "            inner join Class cl on cl.ID =csc.idClass " +
+            "            left join StudentCore sc on csc.idStudent = sc.idStudent and cl.ID = sc.idClass " +
+            "            where csc.idStudent = :idStudent",nativeQuery = true)
+    List<CourseView> findCourseByIdStudent(Integer idStudent);
 }

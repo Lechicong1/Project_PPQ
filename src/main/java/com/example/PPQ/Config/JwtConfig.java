@@ -1,6 +1,7 @@
 package com.example.PPQ.Config;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import jakarta.servlet.http.Cookie;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +11,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -17,7 +19,7 @@ import java.util.Base64;
 
 @Configuration
 public class JwtConfig {
-    @Value("${security.authentication.jwt.base64-secret}")
+    @Value("${spring.security.authentication.jwt.base64-secret}")
     private String secretKey;
 
     //giai ma secretkey
@@ -43,6 +45,21 @@ public class JwtConfig {
             }
         };
     }
+    @Bean
+    public BearerTokenResolver bearerTokenResolver() {
+        return request -> {
+            // Lấy token từ cookie có tên "access_token"
+            if (request.getCookies() != null) {
+                for (Cookie cookie : request.getCookies()) {
+                    if ("access_token".equals(cookie.getName())) {
+                        return cookie.getValue();
+                    }
+                }
+            }
+            return null;
+        };
+    }
+
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter authoritiesConverter = new JwtGrantedAuthoritiesConverter();

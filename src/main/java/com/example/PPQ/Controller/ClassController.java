@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@PreAuthorize("hasAuthority('ADMIN')")
 @RequestMapping("/classes")
-
 public class ClassController {
     @Autowired
     ClassService classService;
@@ -29,7 +29,7 @@ public class ClassController {
         status = HttpStatus.OK;
         return ResponseEntity.status(status).body(responseData);
     }
-    @PreAuthorize("hasAuthority('USER')")
+    @PreAuthorize("hasAnyAuthority('USER','STUDENT')")
     @GetMapping(value = "/{idCourse}")
     public ResponseEntity<?> getClassByIdCourse(@PathVariable int idCourse) {
         ResponseData responseData = new ResponseData();

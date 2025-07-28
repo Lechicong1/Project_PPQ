@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@PreAuthorize("hasAuthority('ADMIN')")
 @RequestMapping("/course/register")
 public class RegisterCourseController {
     @Autowired
@@ -36,6 +37,7 @@ public class RegisterCourseController {
         }
         return ResponseEntity.status(status).body(responseData);
     }
+
     @GetMapping
     public ResponseEntity<?> getAllCourseRegister(){
         ResponseData responseData = new ResponseData();

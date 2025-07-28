@@ -5,6 +5,7 @@ import com.example.PPQ.Entity.*;
 import com.example.PPQ.Exception.ResourceNotFoundException;
 import com.example.PPQ.Payload.Request.CourseRequest;
 import com.example.PPQ.Payload.Response.CourseDTO;
+import com.example.PPQ.Payload.Projection_Interface.CourseView;
 import com.example.PPQ.Service_Imp.CourseServiceImp;
 import com.example.PPQ.respository.*;
 import org.jsoup.Jsoup;
@@ -26,8 +27,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -103,8 +102,6 @@ public class CourseService implements CourseServiceImp {
 
     @Override
     public void addCourse(CourseRequest courseRequest, MultipartFile file ) {
-
-
             // Lưu ảnh vào thư mục
             String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
             Path uploadPath = Paths.get("upload/courses");
@@ -185,15 +182,9 @@ public class CourseService implements CourseServiceImp {
     @Override
     public void deleteCourse(int id) {
         //xoa idcourse o bang class
-        List<ClassesEntity> classesEntity=classRespository.findByIdCourses(id);
-        if(!classesEntity.isEmpty()) {
-            classRespository.deleteAll(classesEntity);
-        }
+        classRespository.deleteClassByIdCourses(id);
         // xoa bản ghi liên quan đến khóa học trong coursestudentclass
-        List<CourseStudentClassEntity> courestudentclass =courseStudentClassRepository.findByIdCourse(id);
-        if(!courestudentclass.isEmpty()) {
-            courseStudentClassRepository.deleteAll(courestudentclass);
-        }
+        courseStudentClassRepository.deleteCourseStudentClassByIdCourses(id);
 
         CourseEntity course_delete=courseRespository.findById(id).orElseThrow(()->new ResourceNotFoundException("Không tồn tại khóa học "));
         // Lấy tên file ảnh
@@ -211,7 +202,6 @@ public class CourseService implements CourseServiceImp {
     @Override
     public List<String> getAllLanguages() {
         List<String> languages= courseRespository.getAllLanguages();
-
         return languages;
     }
 
@@ -241,39 +231,41 @@ public class CourseService implements CourseServiceImp {
     public List<CourseDTO> getCourseByIdStudent() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username=auth.getName();
-        UserEntity user=usersRepository.findByUsername(username);
-        if(user==null){
-            throw new ResourceNotFoundException("Không tồn tại User");
+        StudentEntity student = studentRespository.findByUserName(username);
+        if(student==null) throw new ResourceNotFoundException("Học sinh không tồn tại");
+        List<CourseView> courseView=courseRespository.findCourseByIdStudent(student.getId());
+        if(courseView.isEmpty()){
+            throw new ResourceNotFoundException("Bạn chưa đăng kí khóa học nào");
         }
-        StudentEntity student = studentRespository.findById(user.getId()).orElseThrow(()->new ResourceNotFoundException("Học sinh không tồn tại")) ;
-        List<CourseStudentClassEntity> courseStudentClassEntities=courseStudentClassRepository.findByIdStudent(student.getId());
-        if(courseStudentClassEntities==null){
-            throw new ResourceNotFoundException("Khóa học này chưa có sinh viên đăng kí ");
-        }
-        Set<Integer> listIdCourse = courseStudentClassEntities.stream().map(CourseStudentClassEntity ::getIdCourse).collect(Collectors.toSet());
-        Set<Integer> listIdClass = courseStudentClassEntities.stream().map(CourseStudentClassEntity ::getIdClass).collect(Collectors.toSet());
-        List<CourseEntity> listCourseEntity = courseRespository.findAllByIdIn(listIdCourse);
-        List<ClassesEntity> listClassesEntity = classRespository.findAllByIdIn(listIdClass);
-        Map<Integer,CourseEntity> mapCourse= listCourseEntity.stream().collect(Collectors.toMap(CourseEntity::getId, Function.identity()));
-        Map<Integer,ClassesEntity> mapClass= listClassesEntity.stream().collect(Collectors.toMap(ClassesEntity::getId, Function.identity()));
         List<CourseDTO> course_response=new ArrayList<>();
-        for(CourseStudentClassEntity c:courseStudentClassEntities){
+        for(CourseView c:courseView){
             CourseDTO courseStudent = new CourseDTO();
-            CourseEntity course =mapCourse.get(c.getIdCourse());
-            if(course==null){
-                throw new ResourceNotFoundException("Không tồn tại khóa học ");
-            }
-            courseStudent.setId(course.getId());
-            courseStudent.setNameCourse(course.getNameCourse());
-            courseStudent.setFee(course.getFee());
+            courseStudent.setNameCourse(c.getNameCourse());
+            courseStudent.setFee(c.getFee());
             courseStudent.setEnrollmentDate(c.getEnrollmentDate());
-            ClassesEntity classes = mapClass.get(c.getIdClass());
-            if(classes==null)
-              throw new ResourceNotFoundException("Không tồn tại lớp học ");
-            courseStudent.setNameClass(classes.getClassName());
-            courseStudent.setNumberSessions(course.getNumberSessions());
+            courseStudent.setNameClass(c.getNameClass());
+            courseStudent.setNumberSessions(c.getNumberSessions());
+            Float score1 = c.getScore1() == null ? 0f : c.getScore1();
+            Float score2 = c.getScore2() == null ? 0f : c.getScore2();
+            Float score3 = c.getScore3() == null ? 0f : c.getScore3();
+            Integer absent = c.getAbsentDays() == null ? 0 : c.getAbsentDays();
+            Integer attented = c.getAttentedDay() == null ? 0 : c.getAttentedDay();
+            Float scoreHomework = c.getScoreHomework() == null ? 0f : c.getScoreHomework();
+            courseStudent.setScore1(score1);
+            courseStudent.setScore2(score2);
+            courseStudent.setScore3(score3);
+            courseStudent.setScoreHomework(scoreHomework);
+            courseStudent.setAbsentDays(absent);
+            courseStudent.setAttentedDay(attented);
+            Float totalScore = ( score1 + score2 + 2*score3 + scoreHomework) / 5f;
+            courseStudent.setTotalScore(totalScore);
+            if(totalScore < 6  || absent > 4  ){
+                courseStudent.setResult("fail");
+            }
+            else{
+                courseStudent.setResult("pass");
+            }
             course_response.add(courseStudent);
-
         }
         return course_response;
     }

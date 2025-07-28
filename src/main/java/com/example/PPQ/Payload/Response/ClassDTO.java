@@ -10,6 +10,15 @@ public class ClassDTO {
     private String status;
     private int idCourses;
     private int idTeachers;
+    private String roadMap;
+
+    public String getRoadMap() {
+        return roadMap;
+    }
+
+    public void setRoadMap(String roadMap) {
+        this.roadMap = roadMap;
+    }
 
     public int getIdCourses() {
         return idCourses;

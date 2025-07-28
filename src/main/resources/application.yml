@@ -5,13 +5,13 @@ spring:
       time-to-live: 3600000  # TTL cho cache: 1 giờ
   data:
       redis:
-        host: localhost
-        port: 6380
+        host: ${REDIS_HOST:localhost}
+        port: ${REDIS_PORT:6380}
         database: 0
   datasource:
-    url: jdbc:mysql://localhost:3307/PPQ
-    username: root
-    password: admin123
+    url: ${DB_URL:jdbc:mysql://localhost:3307/PPQ}
+    username: ${DB_USER:root}
+    password: ${DB_PASS:admin123}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -48,14 +48,29 @@ spring:
           ssl:
             trust: "smtp.gmail.com"  # ◀ Bắt buộc để xác thực chứng chỉ
           protocols: "TLSv1.2"  # ◀ Force dùng TLS 1.2+
-security:
-  authentication:
-    jwt:
-      base64-secret: WlSKedhlklTqSrR1VajEv/U46TLFKfLGqNk5d8MqfkNfyuHTuRpeu5bQCxxvvRlRk1G/F6WahwflnqKZP40KaQ==
-      token-validity-in-seconds: 86400
+  security:
+    authentication:
+      jwt:
+        base64-secret: WlSKedhlklTqSrR1VajEv/U46TLFKfLGqNk5d8MqfkNfyuHTuRpeu5bQCxxvvRlRk1G/F6WahwflnqKZP40KaQ==
+        token-validity-in-seconds: 1800
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 963355948941-rno0bjab0mg1h8msus6l26i8dcdh70a4.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+              - email
+              - profile
+            redirect-uri: "{baseUrl}/login/oauth2/code/google"  # baseUrl mặc định là http://localhost:8080
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
 app:
   base-url: ${BASE_URL:http://localhost:8080}
 payment:
-  bank-code: TPB
-  account-number: 77163476666
-  account-name: Le Chi Cong
+  bank-code: MB
+  account-number: 0386330822
+  account-name: LE THI PHUONG
