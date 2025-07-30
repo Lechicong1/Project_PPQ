@@ -1,19 +1,20 @@
 package com.example.PPQ.Payload.Response;
 
+import com.example.PPQ.Entity.CourseEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public class CourseDTO {
-        private Integer id;
-        private String nameCourse;
-        private String Description;
-        private BigDecimal Fee;
-        private String imagePath;
-        private Integer numberSessions;
-        private String language;
-        private  String nameClass;
+    public class CourseDTO {
+            private Integer id;
+            private String nameCourse;
+            private String Description;
+            private BigDecimal Fee;
+            private String imagePath;
+            private Integer numberSessions;
+            private String language;
+            private  String nameClass;
 
     private Float score1;
     private Float score2;
@@ -28,8 +29,18 @@ public class CourseDTO {
         public Integer getNumberSessions() {
             return numberSessions;
         }
+        public CourseDTO(){}
+        public CourseDTO(CourseEntity entity) {
+            this.id = entity.getId();
+            this.nameCourse = entity.getNameCourse();
+            this.Description = entity.getDescription();
+            this.Fee = entity.getFee();
+            this.numberSessions = entity.getNumberSessions();
+            this.language = entity.getLanguage();
 
-    public String getNameClass() {
+        }
+
+        public String getNameClass() {
         return nameClass;
     }
 

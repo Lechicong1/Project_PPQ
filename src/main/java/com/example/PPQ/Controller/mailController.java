@@ -2,7 +2,7 @@ package com.example.PPQ.Controller;
 
 import com.example.PPQ.Payload.Request.contactRequest;
 import com.example.PPQ.Payload.Response.ResponseData;
-import com.example.PPQ.Service.EmailService;
+import com.example.PPQ.ServiceImp.mail.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,6 @@ public class mailController {
 
     @PostMapping
     public ResponseEntity<?> sendMessage(@RequestBody contactRequest request) {
-
             ResponseData responseData =new ResponseData();
             HttpStatus status = HttpStatus.OK;
             if( emailService.sendContactEmail(request)){

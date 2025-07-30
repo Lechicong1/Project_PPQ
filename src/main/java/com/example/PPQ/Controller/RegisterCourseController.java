@@ -3,7 +3,7 @@ package com.example.PPQ.Controller;
 import com.example.PPQ.Payload.Request.RegisterCourseRequest;
 import com.example.PPQ.Payload.Response.CourseRegisterRespone;
 import com.example.PPQ.Payload.Response.ResponseData;
-import com.example.PPQ.Service.RegisterCourseService;
+import com.example.PPQ.ServiceImp.RegisterCourseService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

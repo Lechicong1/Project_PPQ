@@ -1,5 +1,6 @@
 package com.example.PPQ.Payload.Response;
 
+import com.example.PPQ.Payload.Projection_Interface.CourseRegisterView;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
@@ -14,6 +15,13 @@ public class CourseRegisterRespone {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime enrollmentDate;
 
+    public CourseRegisterRespone(){}
+    public CourseRegisterRespone(CourseRegisterView c){
+        this.nameCourse = c.getNameCourse();
+        this.nameClass = c.getNameClass();
+        this.nameStudent=c.getFullName();
+        this.enrollmentDate=c.getEnrollmentDate();
+    }
     public int getIdCourse() {
         return idCourse;
     }

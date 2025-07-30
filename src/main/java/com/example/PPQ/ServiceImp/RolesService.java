@@ -1,11 +1,10 @@
-package com.example.PPQ.Service;
+package com.example.PPQ.ServiceImp;
 
 import com.example.PPQ.Entity.RolesEntity;
-import com.example.PPQ.Entity.UserEntity;
 import com.example.PPQ.Exception.ResourceNotFoundException;
 import com.example.PPQ.Payload.Request.RolesRequest;
 import com.example.PPQ.Payload.Response.RolesDTO;
-import com.example.PPQ.Service_Imp.RoleService;
+import com.example.PPQ.Service.RoleService;
 import com.example.PPQ.respository.Roles_respository;
 import com.example.PPQ.respository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;

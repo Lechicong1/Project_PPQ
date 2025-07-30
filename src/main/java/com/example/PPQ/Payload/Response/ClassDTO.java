@@ -1,5 +1,8 @@
 package com.example.PPQ.Payload.Response;
 
+import com.example.PPQ.Entity.ClassesEntity;
+import com.example.PPQ.Payload.Projection_Interface.ClassView;
+
 public class ClassDTO {
     private int id;
     private String className;
@@ -12,6 +15,19 @@ public class ClassDTO {
     private int idTeachers;
     private String roadMap;
 
+    public ClassDTO() {
+    }
+    public ClassDTO(ClassView classView) {
+       this.id = classView.getId();
+       this.className=classView.getNameClass();
+       this.nameCourse=classView.getNameCourse();
+       this.nameTeacher=classView.getNameTeacher();
+       this.maxStudents=classView.getMaxStudents();
+       this.currentStudents=classView.getCurrentStudents();
+       this.status=classView.getStatus();
+       this.roadMap=classView.getRoadMap();
+
+    }
     public String getRoadMap() {
         return roadMap;
     }

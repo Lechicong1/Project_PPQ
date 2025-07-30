@@ -28,7 +28,10 @@ public interface ScheduleRespository extends JpaRepository<ScheduleEntity,Intege
             "(:thu IS NULL OR :thu = '' OR sc.thu LIKE :thu) AND " +
             "(:idClass IS NULL OR sc.idClass =:idClass)",nativeQuery = true)
     List<ScheduleView> findScheduleByThuAndIdClass(String thu, Integer idClass);
-    @Query(value = "SELECT " +
+    @Query(value = "with findStudentByUserName as( select s.ID from Student s " +
+            " inner join Users u on s.idUsers = u.ID  " +
+            " where u.username = :userName ) " +
+            "SELECT " +
             "sc.ID as id, " +
             "sc.idClass as idClass, " +
             "sc.nameRoom as nameRoom, " +
@@ -42,8 +45,8 @@ public interface ScheduleRespository extends JpaRepository<ScheduleEntity,Intege
             "INNER JOIN Class cl ON c.idClass = cl.ID " +
             "INNER JOIN Schedule sc ON c.idClass = sc.idClass " +
             "INNER JOIN Course ON Course.ID = c.idCourse " +
-            "WHERE s.ID = :idStudent", nativeQuery = true)
-    List<ScheduleView> findByStudent(int idStudent);
+            "WHERE s.ID = (select s.ID from findStudentByUserName s) ", nativeQuery = true)
+    List<ScheduleView> findScheduleForStudentByUserName( String userName);
     @Query(value = "SELECT " +
             "sc.ID as id, " +
             "sc.idClass as idClass, " +

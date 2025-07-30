@@ -2,7 +2,7 @@ package com.example.PPQ.Controller;
 
 import com.example.PPQ.Payload.Request.registerRequest;
 import com.example.PPQ.Payload.Response.ResponseData;
-import com.example.PPQ.Service.RegisterService;
+import com.example.PPQ.ServiceImp.RegisterService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

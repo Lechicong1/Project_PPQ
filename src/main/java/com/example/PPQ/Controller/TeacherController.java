@@ -1,12 +1,11 @@
 package com.example.PPQ.Controller;
 
 import com.example.PPQ.Entity.TeacherEntity;
-import com.example.PPQ.Entity.UserEntity;
 import com.example.PPQ.Exception.ResourceNotFoundException;
 import com.example.PPQ.Payload.Request.TeacherRequest;
 import com.example.PPQ.Payload.Response.ResponseData;
 import com.example.PPQ.Payload.Response.TeacherDTO;
-import com.example.PPQ.Service.TeacherService;
+import com.example.PPQ.ServiceImp.TeacherService;
 import com.example.PPQ.respository.TeacherRespository;
 import com.example.PPQ.respository.UsersRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 

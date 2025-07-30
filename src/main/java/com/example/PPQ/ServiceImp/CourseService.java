@@ -1,12 +1,12 @@
 
-package com.example.PPQ.Service;
+package com.example.PPQ.ServiceImp;
 
 import com.example.PPQ.Entity.*;
 import com.example.PPQ.Exception.ResourceNotFoundException;
 import com.example.PPQ.Payload.Request.CourseRequest;
 import com.example.PPQ.Payload.Response.CourseDTO;
 import com.example.PPQ.Payload.Projection_Interface.CourseView;
-import com.example.PPQ.Service_Imp.CourseServiceImp;
+import com.example.PPQ.Service.CourseServiceImp;
 import com.example.PPQ.respository.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -71,14 +71,8 @@ public class CourseService implements CourseServiceImp {
             throw new ResourceNotFoundException("Khóa học không tồn tại ");
         String Url =baseUrl+ "/upload/courses/";
         for(CourseEntity c:course){
-            CourseDTO course_dto=new CourseDTO();
-            course_dto.setId(c.getId());
-            course_dto.setNameCourse(c.getNameCourse());
-            course_dto.setFee(c.getFee());
-            course_dto.setDescription(c.getDescription());
+            CourseDTO course_dto=new CourseDTO(c);
             course_dto.setImagePath(Url+c.getImagePath());
-            course_dto.setNumberSessions(c.getNumberSessions());
-            course_dto.setLanguage(c.getLanguage());
             listcourse_dto.add(course_dto);
         }
 
@@ -87,16 +81,10 @@ public class CourseService implements CourseServiceImp {
 
     @Override
     public CourseDTO getCourseByID(int id) {
-        CourseDTO course_dto=new CourseDTO();
         String Url =baseUrl+ "/upload/courses/";
         CourseEntity courseEntity=courseRespository.findById(id).orElseThrow(()->new ResourceNotFoundException("Khóa học không tồn tại "));
-        course_dto.setNameCourse(courseEntity.getNameCourse());
-        course_dto.setFee(courseEntity.getFee());
-        course_dto.setDescription(courseEntity.getDescription());
-        course_dto.setLanguage(courseEntity.getLanguage());
-        course_dto.setNumberSessions(courseEntity.getNumberSessions());
+        CourseDTO course_dto=new CourseDTO(courseEntity);
         course_dto.setImagePath(Url+courseEntity.getImagePath());
-        course_dto.setId(courseEntity.getId());
         return course_dto;
     }
 
@@ -114,7 +102,6 @@ public class CourseService implements CourseServiceImp {
                 Path filePath = uploadPath.resolve(fileName);
                 Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-
                 CourseEntity courseEntity = new CourseEntity();
                 courseEntity.setNameCourse(courseRequest.getNameCourse());
                 courseEntity.setFee(courseRequest.getFee());
@@ -130,7 +117,6 @@ public class CourseService implements CourseServiceImp {
 
 
     }
-
     @Override
     public void updateCourse(int id, CourseRequest courseRequest,MultipartFile file) {
 
@@ -213,14 +199,8 @@ public class CourseService implements CourseServiceImp {
             throw new ResourceNotFoundException("Khóa học không tồn tại ");
         String Url =baseUrl+ "/upload/courses/";
         for(CourseEntity c:course){
-            CourseDTO course_dto=new CourseDTO();
-            course_dto.setId(c.getId());
-            course_dto.setNameCourse(c.getNameCourse());
-            course_dto.setFee(c.getFee());
-            course_dto.setDescription(c.getDescription());
+            CourseDTO course_dto=new CourseDTO(c);
             course_dto.setImagePath(Url+c.getImagePath());
-            course_dto.setNumberSessions(c.getNumberSessions());
-            course_dto.setLanguage(c.getLanguage());
             listcourse_dto.add(course_dto);
         }
 

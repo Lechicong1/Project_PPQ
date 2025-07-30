@@ -3,7 +3,7 @@ package com.example.PPQ.Controller;
 import com.example.PPQ.Payload.Request.StudentRequest;
 import com.example.PPQ.Payload.Response.ResponseData;
 import com.example.PPQ.Payload.Response.StudentDTO;
-import com.example.PPQ.Service.StudentService;
+import com.example.PPQ.ServiceImp.StudentService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

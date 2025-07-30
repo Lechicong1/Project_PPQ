@@ -1,5 +1,6 @@
 package com.example.PPQ.Payload.Response;
 
+import com.example.PPQ.Payload.Projection_Interface.ScheduleView;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalTime;
@@ -14,16 +15,16 @@ public class ScheduleDTO {
     private Integer idClass;
     private String nameCourse;
     public ScheduleDTO() {}
-        public ScheduleDTO(Integer id,Integer idClass,  String nameRoom,String thu,  LocalTime startTime, LocalTime endTime,String nameClass,  String nameCourse) {
-            this.id = id;
-            this.nameClass = nameClass;
-            this.nameRoom = nameRoom;
-            this.startTime = startTime;
-            this.endTime = endTime;
-            this.thu = thu;
-            this.idClass = idClass;
-            this.nameCourse = nameCourse;
-        }
+    public ScheduleDTO(ScheduleView v){
+        this.id = v.getId();
+        this.nameClass = v.getNameClass();
+        this.nameRoom = v.getNameRoom();
+        this.startTime = v.getStartTime();
+        this.endTime = v.getEndTime();
+        this.thu = v.getThu();
+        this.idClass = v.getIdClass();
+        this.nameCourse = v.getNameCourse();
+    }
 
     public String getNameCourse() {
         return nameCourse;

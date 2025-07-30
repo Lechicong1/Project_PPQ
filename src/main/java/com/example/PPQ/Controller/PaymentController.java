@@ -4,7 +4,7 @@ import com.example.PPQ.Payload.Request.PaymentRequest;
 import com.example.PPQ.Payload.Response.PaymentRespone;
 import com.example.PPQ.Payload.Response.QRRespone;
 import com.example.PPQ.Payload.Response.ResponseData;
-import com.example.PPQ.Service.PaymentService;
+import com.example.PPQ.ServiceImp.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

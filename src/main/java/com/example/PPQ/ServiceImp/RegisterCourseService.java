@@ -1,4 +1,4 @@
-package com.example.PPQ.Service;
+package com.example.PPQ.ServiceImp;
 
 import com.example.PPQ.Entity.*;
 import com.example.PPQ.Exception.DuplicateResourceException;
@@ -6,7 +6,7 @@ import com.example.PPQ.Exception.ResourceNotFoundException;
 import com.example.PPQ.Payload.Request.RegisterCourseRequest;
 import com.example.PPQ.Payload.Response.CourseRegisterRespone;
 import com.example.PPQ.Payload.Projection_Interface.CourseRegisterView;
-import com.example.PPQ.Service_Imp.RegisterCourseServiceImp;
+import com.example.PPQ.Service.RegisterCourseServiceImp;
 import com.example.PPQ.respository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -87,11 +87,7 @@ public class RegisterCourseService implements RegisterCourseServiceImp {
         List<CourseRegisterView> courseRegisterViews = courseStudentRepository.findAllCourseRegister();
         List<CourseRegisterRespone> courseRegisterRespones = new ArrayList<>();
         for(CourseRegisterView c:courseRegisterViews){
-            CourseRegisterRespone courseRegisterRespone = new CourseRegisterRespone();
-            courseRegisterRespone.setEnrollmentDate(c.getEnrollmentDate());
-            courseRegisterRespone.setNameStudent(c.getFullName());
-            courseRegisterRespone.setNameCourse(c.getNameCourse());
-            courseRegisterRespone.setNameClass(c.getNameClass());
+            CourseRegisterRespone courseRegisterRespone = new CourseRegisterRespone(c);
             courseRegisterRespones.add(courseRegisterRespone);
         }
         return courseRegisterRespones;
@@ -102,11 +98,7 @@ public class RegisterCourseService implements RegisterCourseServiceImp {
         List<CourseRegisterView> courseRegisterViews = courseStudentRepository.searchCourseRegister(idCourse,nameStudent,idClass);
         List<CourseRegisterRespone> courseRegisterRespones = new ArrayList<>();
         for(CourseRegisterView c:courseRegisterViews){
-            CourseRegisterRespone courseRegisterRespone = new CourseRegisterRespone();
-            courseRegisterRespone.setEnrollmentDate(c.getEnrollmentDate());
-            courseRegisterRespone.setNameStudent(c.getFullName());
-            courseRegisterRespone.setNameCourse(c.getNameCourse());
-            courseRegisterRespone.setNameClass(c.getNameClass());
+            CourseRegisterRespone courseRegisterRespone = new CourseRegisterRespone(c);
             courseRegisterRespones.add(courseRegisterRespone);
         }
         return courseRegisterRespones;

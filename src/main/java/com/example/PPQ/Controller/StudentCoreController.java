@@ -2,9 +2,8 @@ package com.example.PPQ.Controller;
 
 import com.example.PPQ.Payload.Request.AttendanceRequest;
 import com.example.PPQ.Payload.Request.StudentCoreRequest;
-import com.example.PPQ.Payload.Response.CourseDTO;
 import com.example.PPQ.Payload.Response.ResponseData;
-import com.example.PPQ.Service.StudentCoreService;
+import com.example.PPQ.ServiceImp.StudentCoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

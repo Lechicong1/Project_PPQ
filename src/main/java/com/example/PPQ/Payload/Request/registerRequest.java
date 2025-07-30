@@ -1,11 +1,13 @@
 package com.example.PPQ.Payload.Request;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class registerRequest {
     @NotBlank(message = "Username không được để trống")
+    @Email(message = "Email không hợp lệ")
     private String username;
     @Size(min = 6, max = 20, message = "Mật khẩu phải từ 6 đến 20 ký tự")
     @Pattern(

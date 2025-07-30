@@ -1,4 +1,4 @@
-package com.example.PPQ.Service_Imp;
+package com.example.PPQ.Service;
 
 import com.example.PPQ.Payload.Request.RolesRequest;
 import com.example.PPQ.Payload.Response.RolesDTO;

@@ -1,4 +1,4 @@
-package com.example.PPQ.Service;
+package com.example.PPQ.ServiceImp;
 
 import com.example.PPQ.Entity.RolesEntity;
 import com.example.PPQ.Entity.UserEntity;
@@ -6,9 +6,10 @@ import com.example.PPQ.Exception.DuplicateResourceException;
 import com.example.PPQ.Exception.InvalidInputException;
 import com.example.PPQ.Exception.ResourceNotFoundException;
 import com.example.PPQ.Payload.Request.registerRequest;
-import com.example.PPQ.Service_Imp.RegisterImp;
+import com.example.PPQ.Service.RegisterImp;
 import com.example.PPQ.respository.Roles_respository;
 import com.example.PPQ.respository.UsersRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class RegisterService implements RegisterImp {
     PasswordEncoder passwordEncoder;
 
     @Override
-    public void register(registerRequest request) {
+    public void register( @Valid registerRequest request) {
         UserEntity user = new UserEntity();
         RolesEntity role = roles_repository.findByRoleName("USER");
         if(role==null)

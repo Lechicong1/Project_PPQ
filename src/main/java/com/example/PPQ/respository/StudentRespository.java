@@ -24,7 +24,7 @@ public interface StudentRespository extends JpaRepository<StudentEntity,Integer>
            "s.idUsers = u.ID\n" +
            "WHERE u.username = :username",nativeQuery = true
    )
-    StudentEntity findByUserName(String username);
+    StudentEntity   findByUserName(String username);
     @Query(value = "SELECT  s.ID as id , \n" +
             "\t\ts.fullName as fullName,\n" +
             "\t\ts.phoneNumber ,\n" +

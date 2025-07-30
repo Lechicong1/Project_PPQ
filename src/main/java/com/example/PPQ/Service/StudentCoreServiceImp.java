@@ -1,4 +1,4 @@
-package com.example.PPQ.Service_Imp;
+package com.example.PPQ.Service;
 
 import com.example.PPQ.Payload.Request.AttendanceRequest;
 import com.example.PPQ.Payload.Request.StudentCoreRequest;

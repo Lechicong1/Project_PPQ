@@ -35,7 +35,7 @@ public interface UsersRepository extends JpaRepository<UserEntity,Integer> {
     List<UserEntity> findAllByIdIn(Set<Integer> id);
     @Modifying
     @Query(value = "with roleUsers as ( select r.ID from Roles as r where r.roleName = :roleName limit 1)\n" +
-            "update Users u set u.idRoles = (select r.ID from roleUsers as r ) where u.ID = 30",nativeQuery = true)
+            "update Users u set u.idRoles = (select r.ID from roleUsers as r ) where u.ID = :idUser",nativeQuery = true)
     void setRolesUsers( String roleName,  int idUser);
     @Modifying
     @Query("update UserEntity as u \n" +

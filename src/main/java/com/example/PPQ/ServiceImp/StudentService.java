@@ -1,4 +1,4 @@
-package com.example.PPQ.Service;
+package com.example.PPQ.ServiceImp;
 
 import com.example.PPQ.Entity.*;
 import com.example.PPQ.Exception.ForbiddenException;
@@ -6,7 +6,7 @@ import com.example.PPQ.Exception.ResourceNotFoundException;
 import com.example.PPQ.Payload.Projection_Interface.StudentCoreView;
 import com.example.PPQ.Payload.Request.StudentRequest;
 import com.example.PPQ.Payload.Response.StudentDTO;
-import com.example.PPQ.Service_Imp.StudentServiceImp;
+import com.example.PPQ.Service.StudentServiceImp;
 import com.example.PPQ.respository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,10 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -45,17 +41,6 @@ public class StudentService implements StudentServiceImp {
             std_dto.setId(s.getId());
             std_dto.setFullName(s.getFullName());
             std_dto.setPhoneNumber(s.getPhoneNumber());
-//            Float score1 = s.getScore1() == null ? 0f : s.getScore1();
-//            Float score2 = s.getScore2() == null ? 0f : s.getScore2();
-//            Float score3 = s.getScore3() == null ? 0f : s.getScore3();
-//            Float scoreHomework = s.getScoreHomework() == null ? 0f : s.getScoreHomework();
-//            std_dto.setScore1(score1);
-//            std_dto.setScore2(score2);
-//            std_dto.setScore3(score3);
-//            std_dto.setScoreHomework(scoreHomework);
-//            std_dto.setAbsentDays(s.getAbsentDays());
-//            std_dto.setAttentedDay(s.getAttentedDay());
-//            std_dto.setTotalScore(( score1 + score2 + score3 + scoreHomework) / 4);
             student_dto.add(std_dto);
         }
         return student_dto;
@@ -65,14 +50,6 @@ public class StudentService implements StudentServiceImp {
     public StudentDTO getStudentById(int id) {
         StudentDTO std_dto=new StudentDTO();
         StudentEntity studentEntity=studentRespository.findById(id).orElseThrow(()->new ResourceNotFoundException("Học sinh không tồn tại"));
-//        std_dto.setFullName(studentEntity.getFullName());
-//        std_dto.setIdUsers(studentEntity.getIdUsers());
-//        std_dto.setPhoneNumber(studentEntity.getPhoneNumber());
-//        std_dto.setScore1(studentEntity.getScore1());
-//        std_dto.setScore2(studentEntity.getScore2());
-//        std_dto.setScore3(studentEntity.getScore3());
-//        std_dto.setScoreHomework(studentEntity.getScoreHomework());
-//        std_dto.setTotalScore((studentEntity.getScore1()+studentEntity.getScore2()+studentEntity.getScore3()+studentEntity.getScoreHomework())/4);
         return std_dto;
     }
 
@@ -116,19 +93,6 @@ public class StudentService implements StudentServiceImp {
         if(student.getPhoneNumber()!=null){
             studentEntity.setPhoneNumber(student.getPhoneNumber());
         }
-//        if(student.getScore1()!=null){
-//            studentEntity.setScore1(studentEntity.getScore1());
-//        }
-//        if(student.getScore2()!=null){
-//            studentEntity.setScore2(student.getScore2());
-//        }
-//        if(student.getScore3()!=null){
-//            studentEntity.setScore3(student.getScore3());
-//        }
-//        if(student.getScoreHomework()!=null){
-//            studentEntity.setScoreHomework(student.getScoreHomework());
-//        }
-
             studentRespository.save(studentEntity);
     }
     @Transactional
@@ -198,17 +162,7 @@ public class StudentService implements StudentServiceImp {
         std_dto.setId(s.getId());
         std_dto.setPhoneNumber(s.getPhoneNumber());
         std_dto.setFullName(s.getFullName());
-//        Float score1 = s.getScore1() == null ? 0f : s.getScore1();
-//        Float score2 = s.getScore2() == null ? 0f : s.getScore2();
-//        Float score3 = s.getScore3() == null ? 0f : s.getScore3();
-//        Float scoreHomework = s.getScoreHomework() == null ? 0f : s.getScoreHomework();
-//        std_dto.setScore1(score1);
-//        std_dto.setScore2(score2);
-//        std_dto.setScore3(score3);
-//        std_dto.setScoreHomework(scoreHomework);
-//        std_dto.setAbsentDays(s.getAbsentDays());
-//        std_dto.setAttentedDay(s.getAttentedDay());
-//        std_dto.setTotalScore(( score1 + score2 + score3 + scoreHomework) / 4);
+
         return std_dto;
     }
 
@@ -224,17 +178,6 @@ public class StudentService implements StudentServiceImp {
             std_dto.setFullName(s.getFullName());
             std_dto.setId(s.getId());
             std_dto.setPhoneNumber(s.getPhoneNumber());
-//            Float score1 = s.getScore1() == null ? 0f : s.getScore1();
-//            Float score2 = s.getScore2() == null ? 0f : s.getScore2();
-//            Float score3 = s.getScore3() == null ? 0f : s.getScore3();
-//            Float scoreHomework = s.getScoreHomework() == null ? 0f : s.getScoreHomework();
-//            std_dto.setScore1(score1);
-//            std_dto.setScore2(score2);
-//            std_dto.setScore3(score3);
-//            std_dto.setScoreHomework(scoreHomework);
-//            std_dto.setAbsentDays(s.getAbsentDays());
-//            std_dto.setAttentedDay(s.getAttentedDay());
-//            std_dto.setTotalScore(( score1 + score2 + score3 + scoreHomework) / 4);
             student_dto.add(std_dto);
         }
 

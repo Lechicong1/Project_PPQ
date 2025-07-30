@@ -3,7 +3,7 @@ package com.example.PPQ.Controller;
 import com.example.PPQ.Payload.Request.ClassRequest;
 import com.example.PPQ.Payload.Response.ClassDTO;
 import com.example.PPQ.Payload.Response.ResponseData;
-import com.example.PPQ.Service.ClassService;
+import com.example.PPQ.ServiceImp.ClassServiceImp;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,12 +18,12 @@ import java.util.List;
 @RequestMapping("/classes")
 public class ClassController {
     @Autowired
-    ClassService classService;
+    ClassServiceImp classServiceImp;
     @GetMapping
     public ResponseEntity<?> getAllClasses() {
         ResponseData responseData = new ResponseData();
         HttpStatus status = HttpStatus.OK;
-        List<ClassDTO> classResponses =classService.getAllClasses();
+        List<ClassDTO> classResponses = classServiceImp.getAllClasses();
         responseData.setData(classResponses);
         responseData.setSuccess(Boolean.TRUE);
         status = HttpStatus.OK;
@@ -34,7 +34,7 @@ public class ClassController {
     public ResponseEntity<?> getClassByIdCourse(@PathVariable int idCourse) {
         ResponseData responseData = new ResponseData();
         HttpStatus status = HttpStatus.OK;
-        List<ClassDTO> classResponses =classService.getClassByCourse(idCourse);
+        List<ClassDTO> classResponses = classServiceImp.getClassByCourse(idCourse);
             responseData.setData(classResponses);
             responseData.setSuccess(Boolean.TRUE);
             status = HttpStatus.OK;
@@ -45,7 +45,7 @@ public class ClassController {
     public ResponseEntity<?> getClassById() {
         ResponseData responseData = new ResponseData();
         HttpStatus status ;
-        List<ClassDTO> class_dto = classService.getClassByIdTeacher();
+        List<ClassDTO> class_dto = classServiceImp.getClassByIdTeacher();
             responseData.setData(class_dto);
             responseData.setSuccess(Boolean.TRUE);
             status = HttpStatus.OK;
@@ -56,7 +56,7 @@ public class ClassController {
         ResponseData responseData = new ResponseData();
         HttpStatus status = HttpStatus.OK;
 
-       classService.addClasses(classRequest);
+       classServiceImp.addClasses(classRequest);
             responseData.setSuccess(Boolean.TRUE);
             status = HttpStatus.CREATED;
             responseData.setMessage("Thêm lớp học thành công ");
@@ -66,7 +66,7 @@ public class ClassController {
     public ResponseEntity<?> updateClass( @Valid @PathVariable int id,@RequestBody ClassRequest classRequest) {
         ResponseData responseData = new ResponseData();
         HttpStatus status = HttpStatus.OK;
-        classService.updateClass(id,classRequest);
+        classServiceImp.updateClass(id,classRequest);
             responseData.setSuccess(Boolean.TRUE);
             status = HttpStatus.OK;
             responseData.setMessage("Cập nhật lớp học thành công");
@@ -76,7 +76,7 @@ public class ClassController {
     public ResponseEntity<?> deleteClass(@PathVariable int id) {
         ResponseData responseData = new ResponseData();
         HttpStatus status = HttpStatus.OK;
-        classService.deleteClass(id);
+        classServiceImp.deleteClass(id);
             responseData.setSuccess(Boolean.TRUE);
             status = HttpStatus.OK;
             responseData.setMessage("Xóa lớp học thành công");

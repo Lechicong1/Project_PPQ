@@ -1,4 +1,4 @@
-package com.example.PPQ.Service;
+package com.example.PPQ.ServiceImp;
 
 import com.example.PPQ.Entity.AttendanceEntity;
 import com.example.PPQ.Entity.StudentCoreEntity;
@@ -7,7 +7,7 @@ import com.example.PPQ.Payload.Projection_Interface.StudentCoreView;
 import com.example.PPQ.Payload.Request.AttendanceRequest;
 import com.example.PPQ.Payload.Request.StudentCoreRequest;
 import com.example.PPQ.Payload.Response.StudentCoreDTO;
-import com.example.PPQ.Service_Imp.StudentCoreServiceImp;
+import com.example.PPQ.Service.StudentCoreServiceImp;
 import com.example.PPQ.respository.AttendanceRepo;
 import com.example.PPQ.respository.StudentCoreRepo;
 import org.springframework.beans.factory.annotation.Autowired;

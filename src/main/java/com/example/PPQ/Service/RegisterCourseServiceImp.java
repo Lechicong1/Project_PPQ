@@ -1,9 +1,7 @@
-package com.example.PPQ.Service_Imp;
+package com.example.PPQ.Service;
 
-import com.example.PPQ.Entity.CourseStudentClassEntity;
 import com.example.PPQ.Payload.Request.RegisterCourseRequest;
 import com.example.PPQ.Payload.Response.CourseRegisterRespone;
-import com.example.PPQ.Service.RegisterCourseService;
 
 import java.util.List;
 

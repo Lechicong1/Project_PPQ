@@ -1,4 +1,4 @@
-package com.example.PPQ.Service_Imp;
+package com.example.PPQ.Service;
 
 import com.example.PPQ.Payload.Request.TeacherRequest;
 import com.example.PPQ.Payload.Response.TeacherDTO;

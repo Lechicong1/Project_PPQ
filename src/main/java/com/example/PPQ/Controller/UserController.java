@@ -4,7 +4,7 @@ import com.example.PPQ.Payload.Request.UsersRequest;
 import com.example.PPQ.Payload.Request.changePasswordRequest;
 import com.example.PPQ.Payload.Response.ResponseData;
 import com.example.PPQ.Payload.Response.UserDTO;
-import com.example.PPQ.Service.UserService;
+import com.example.PPQ.ServiceImp.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

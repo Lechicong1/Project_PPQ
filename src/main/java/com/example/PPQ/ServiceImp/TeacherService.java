@@ -1,13 +1,12 @@
-package com.example.PPQ.Service;
+package com.example.PPQ.ServiceImp;
 
 import com.example.PPQ.Entity.*;
-import com.example.PPQ.Exception.BusinessLogicException;
 import com.example.PPQ.Exception.DuplicateResourceException;
 import com.example.PPQ.Exception.ForbiddenException;
 import com.example.PPQ.Exception.ResourceNotFoundException;
 import com.example.PPQ.Payload.Request.TeacherRequest;
 import com.example.PPQ.Payload.Response.TeacherDTO;
-import com.example.PPQ.Service_Imp.TeacherServiceImp;
+import com.example.PPQ.Service.TeacherServiceImp;
 import com.example.PPQ.respository.ClassRespository;
 import com.example.PPQ.respository.Roles_respository;
 import com.example.PPQ.respository.TeacherRespository;
@@ -26,8 +25,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -47,15 +44,8 @@ public class TeacherService implements TeacherServiceImp {
         var context = SecurityContextHolder.getContext();  // lay thong tin user dang dang nhap tai contextholder
         String username = context.getAuthentication().getName();  // lay ra username
        TeacherEntity teacherEntity = teacherRespository.findByUserName(username);
-        TeacherDTO teacher_dto = new TeacherDTO();
+        TeacherDTO teacher_dto = new TeacherDTO(teacherEntity);
         String Url =baseUrl+  "/upload/teachers/";
-        System.out.println(Url+teacherEntity.getImagePath());
-        teacher_dto.setId(teacherEntity.getId());
-        teacher_dto.setPhoneNumber(teacherEntity.getPhoneNumber());
-        teacher_dto.setFullName(teacherEntity.getFullName());
-        teacher_dto.setEducationLevel(teacherEntity.getEducationLevel());
-        teacher_dto.setDescription(teacherEntity.getDescription());
-        teacher_dto.setEmail(teacherEntity.getEmail());
         teacher_dto.setImagePath(Url+teacherEntity.getImagePath());
         return teacher_dto;
     }
@@ -96,10 +86,7 @@ public class TeacherService implements TeacherServiceImp {
 //            teacher.setStartDate(teacherRequest.getStartDate());
             // sua lai role cua user do thanh Teacher
             // tim idRole teacher
-            RolesEntity roles_teacher = rolesRespository.findByRoleName("TEACHER");
-            if (roles_teacher == null) {
-                throw new ResourceNotFoundException("Roles Teacher không tồn tại");
-            }
+
             teacherRespository.save(teacher);
             usersRepository.setRolesUsers("TEACHER", userEntity.getId());
     }
@@ -107,13 +94,8 @@ public class TeacherService implements TeacherServiceImp {
     @Override
     public void deleteTeacher(int idTeacher) {
             TeacherEntity teacherDelete=teacherRespository.findById(idTeacher).orElseThrow(()->new ResourceNotFoundException("Không tồn tại giáo viên để xóa"));
-            // tim role user
-            RolesEntity roleUser=rolesRespository.findByRoleName("USER");
-            if(roleUser==null) {
-                throw new ResourceNotFoundException("Không tồn tại ROLE USER");
-            }
             // cap nhat role cua teacher ve thanh user trong bang user
-            usersRepository.setRolesUsers(roleUser.getId(),idTeacher);
+            usersRepository.setRolesUsers("USER",idTeacher);
             classRespository.setIdTeacherNull(idTeacher);
             // Lấy tên file ảnh
             String fileName = teacherDelete.getImagePath(); // ví dụ: "abc123.jpg"
@@ -194,13 +176,8 @@ public class TeacherService implements TeacherServiceImp {
         }
         for(TeacherEntity teacherEntity:teacher){
             String Url = baseUrl+"/upload/teachers/";
-            TeacherDTO teacherResponse=new TeacherDTO();
-            teacherResponse.setId(teacherEntity.getId());
-            teacherResponse.setDescription(teacherEntity.getDescription());
-            teacherResponse.setEducationLevel(teacherEntity.getEducationLevel());
-            teacherResponse.setFullName(teacherEntity.getFullName());
-            teacherResponse.setPhoneNumber(teacherEntity.getPhoneNumber());
-            teacherResponse.setEmail(teacherEntity.getEmail());
+            TeacherDTO teacherResponse=new TeacherDTO(teacherEntity);
+
             teacherResponse.setImagePath(Url+teacherEntity.getImagePath());
             list.add(teacherResponse);
         }

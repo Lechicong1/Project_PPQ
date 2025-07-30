@@ -1,4 +1,4 @@
-package com.example.PPQ.Service;
+package com.example.PPQ.ServiceImp;
 
 import com.example.PPQ.Entity.*;
 import com.example.PPQ.Exception.DuplicateResourceException;
@@ -6,7 +6,7 @@ import com.example.PPQ.Exception.ResourceNotFoundException;
 import com.example.PPQ.Payload.Request.PaymentRequest;
 import com.example.PPQ.Payload.Response.PaymentRespone;
 import com.example.PPQ.Payload.Response.QRRespone;
-import com.example.PPQ.Service_Imp.PaymentServiceImp;
+import com.example.PPQ.Service.PaymentServiceImp;
 import com.example.PPQ.Util.VietQRUtil;
 import com.example.PPQ.respository.*;
 import org.springframework.beans.factory.annotation.Autowired;

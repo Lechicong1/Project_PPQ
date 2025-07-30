@@ -3,7 +3,7 @@ package com.example.PPQ.Controller;
 import com.example.PPQ.Payload.Request.ScheduleRequest;
 import com.example.PPQ.Payload.Response.ResponseData;
 import com.example.PPQ.Payload.Response.ScheduleDTO;
-import com.example.PPQ.Service.ScheduleService;
+import com.example.PPQ.ServiceImp.ScheduleService;
 import com.example.PPQ.respository.UsersRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

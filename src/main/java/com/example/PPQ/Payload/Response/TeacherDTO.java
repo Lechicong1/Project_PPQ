@@ -1,5 +1,7 @@
 package com.example.PPQ.Payload.Response;
 
+import com.example.PPQ.Entity.TeacherEntity;
+
 public class TeacherDTO {
     private String educationLevel;
     private String description;
@@ -29,7 +31,16 @@ public class TeacherDTO {
 //    public void setStartDate(LocalDate startDate) {
 //        this.startDate = startDate;
 //    }
+    public TeacherDTO(TeacherEntity e){
+        this.educationLevel = e.getEducationLevel();
+        this.description = e.getDescription();
+        this.id=e.getId();
+        this.fullName = e.getFullName();
+        this.phoneNumber = e.getPhoneNumber();
+        this.email = e.getEmail();
 
+    }
+    public TeacherDTO(){}
     public String getImagePath() {
         return imagePath;
     }

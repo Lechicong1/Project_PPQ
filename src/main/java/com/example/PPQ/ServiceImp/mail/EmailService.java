@@ -1,8 +1,8 @@
-package com.example.PPQ.Service;
+package com.example.PPQ.ServiceImp.mail;
 
 import com.example.PPQ.Exception.EmailException;
 import com.example.PPQ.Payload.Request.contactRequest;
-import com.example.PPQ.Service_Imp.EmailServiceImp;
+import com.example.PPQ.Service.mailServiceImp.EmailServiceImp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -46,4 +46,37 @@ public class EmailService implements EmailServiceImp {
            throw new EmailException("Lỗi khi gửi tới email admin" + e.getMessage());
         }
     }
+
+    @Override
+    public void sendOtpEmail(String toEmail,String otp) {
+
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        String message=
+               "Mã OTP của bạn là: " + otp +
+              "  OTP sẽ hết hạn sau 5 phút.";
+
+        // Setting up necessary details
+        mailMessage.setFrom(sender);
+        mailMessage.setTo(toEmail);
+        mailMessage.setSubject("Mã xác thực OTP");
+        mailMessage.setText(message);
+        // Sending the mail
+        mailSender.send(mailMessage);
+    }
+
+    @Override
+    public void sendnewPassword(String toEmail) {
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        String message= "Mật khẩu mới của bạn là:" + "Lechicong" ;
+
+        // Setting up necessary details
+        mailMessage.setFrom(sender);
+        mailMessage.setTo(toEmail);
+        mailMessage.setSubject("Mật khẩu mới");
+        mailMessage.setText(message);
+        // Sending the mail
+        mailSender.send(mailMessage);
+    }
+
+
 }

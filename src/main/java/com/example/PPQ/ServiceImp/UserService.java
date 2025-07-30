@@ -1,4 +1,4 @@
-package com.example.PPQ.Service;
+package com.example.PPQ.ServiceImp;
 
 import com.example.PPQ.Entity.*;
 import com.example.PPQ.Exception.BusinessLogicException;
@@ -7,7 +7,7 @@ import com.example.PPQ.Payload.Projection_Interface.UserView;
 import com.example.PPQ.Payload.Request.UsersRequest;
 import com.example.PPQ.Payload.Request.changePasswordRequest;
 import com.example.PPQ.Payload.Response.UserDTO;
-import com.example.PPQ.Service_Imp.UserServiceImp;
+import com.example.PPQ.Service.UserServiceImp;
 import com.example.PPQ.respository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,6 +37,14 @@ public class UserService implements UserServiceImp {
     StudentRespository students_repository;
     @Autowired
     CourseStudentClassRepository courseStudentClassRepo;
+
+    @Override
+    public void setDefaultPassword(String username) {
+        UserEntity user = users_repository.findByUsername(username);
+        user.setPassword(passwordEncoder.encode("Lechicong"));
+        users_repository.save(user);
+    }
+
     @Override
     public List<UserDTO> getAllUsers() {
         List<UserView> users = users_repository.getAllUsersBasic();

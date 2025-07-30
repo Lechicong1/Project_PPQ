@@ -1,4 +1,4 @@
-package com.example.PPQ.Service;
+package com.example.PPQ.ServiceImp;
 
 import com.example.PPQ.Entity.*;
 import com.example.PPQ.Exception.BusinessLogicException;
@@ -6,15 +6,13 @@ import com.example.PPQ.Exception.ResourceNotFoundException;
 import com.example.PPQ.Payload.Request.ScheduleRequest;
 import com.example.PPQ.Payload.Response.ScheduleDTO;
 import com.example.PPQ.Payload.Projection_Interface.ScheduleView;
-import com.example.PPQ.Service_Imp.ScheduleServiceImp;
+import com.example.PPQ.Service.ScheduleServiceImp;
 import com.example.PPQ.respository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -41,14 +39,7 @@ public class ScheduleService implements ScheduleServiceImp {
         if(schedule.isEmpty())
             throw new ResourceNotFoundException("Không tồn tại lịch học");
         for(ScheduleView sc:schedule){
-            ScheduleDTO schedule_dto=new ScheduleDTO();
-            schedule_dto.setIdClass(sc.getIdClass());
-            schedule_dto.setId(sc.getId());
-            schedule_dto.setStartTime(sc.getStartTime());
-            schedule_dto.setEndTime(sc.getEndTime());
-            schedule_dto.setNameClass(sc.getNameClass());
-            schedule_dto.setThu(sc.getThu());
-            schedule_dto.setNameRoom(sc.getNameRoom());
+            ScheduleDTO schedule_dto=new ScheduleDTO(sc);
             listSchedule_dto.add(schedule_dto);
         }
         return listSchedule_dto;
@@ -135,24 +126,13 @@ public class ScheduleService implements ScheduleServiceImp {
 //    @Cacheable(value = "scheduleForStudent", key = "#username", sync = true)
     @Override
     public List<ScheduleDTO> getScheduleForStudent(String username) {
-        StudentEntity student = studentRespository.findByUserName(username);
-        if(student==null){
-            throw new ResourceNotFoundException("Học sinh không tồn tại");
-        }
-        List<ScheduleView> scheduleViews = scheduleRespository.findByStudent(student.getId());
+
+        List<ScheduleView> scheduleViews = scheduleRespository.findScheduleForStudentByUserName( username);
         if(scheduleViews.isEmpty())
             throw new ResourceNotFoundException("Không tồn tại lịch học");
         List<ScheduleDTO> list=new ArrayList<>();
         for(ScheduleView s:scheduleViews){
-            ScheduleDTO scheduleDTO=new ScheduleDTO();
-            scheduleDTO.setId(s.getId());
-            scheduleDTO.setThu(s.getThu());
-            scheduleDTO.setNameRoom(s.getNameRoom());
-            scheduleDTO.setStartTime(s.getStartTime());
-            scheduleDTO.setEndTime(s.getEndTime());
-            scheduleDTO.setIdClass(s.getIdClass());
-            scheduleDTO.setNameClass(s.getNameClass());
-            scheduleDTO.setNameCourse(s.getNameCourse());
+            ScheduleDTO scheduleDTO=new ScheduleDTO(s);
             list.add(scheduleDTO);
         }
         return list;
@@ -168,15 +148,7 @@ public class ScheduleService implements ScheduleServiceImp {
                 throw new ResourceNotFoundException("Không tồn tại lịch học");
             List<ScheduleDTO> list=new ArrayList<>();
             for(ScheduleView s:scheduleViews){
-                ScheduleDTO scheduleDTO=new ScheduleDTO();
-                scheduleDTO.setId(s.getId());
-                scheduleDTO.setThu(s.getThu());
-                scheduleDTO.setNameRoom(s.getNameRoom());
-                scheduleDTO.setStartTime(s.getStartTime());
-                scheduleDTO.setEndTime(s.getEndTime());
-                scheduleDTO.setIdClass(s.getIdClass());
-                scheduleDTO.setNameClass(s.getNameClass());
-                scheduleDTO.setNameCourse(s.getNameCourse());
+                ScheduleDTO scheduleDTO=new ScheduleDTO(s);
                 list.add(scheduleDTO);
             }
             return list;
@@ -192,14 +164,7 @@ public class ScheduleService implements ScheduleServiceImp {
         }
 
         for(ScheduleView sc:schedule){
-            ScheduleDTO schedule_dto=new ScheduleDTO();
-            schedule_dto.setIdClass(sc.getIdClass());
-            schedule_dto.setId(sc.getId());
-            schedule_dto.setStartTime(sc.getStartTime());
-            schedule_dto.setEndTime(sc.getEndTime());
-            schedule_dto.setNameClass(sc.getNameClass());
-            schedule_dto.setThu(sc.getThu());
-            schedule_dto.setNameRoom(sc.getNameRoom());
+            ScheduleDTO schedule_dto=new ScheduleDTO(sc);
             listSchedule_dto.add(schedule_dto);
         }
         return listSchedule_dto;

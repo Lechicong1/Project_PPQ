@@ -1,8 +1,7 @@
-package com.example.PPQ.Service_Imp;
+package com.example.PPQ.Service;
 
 import com.example.PPQ.Payload.Request.ScheduleRequest;
 import com.example.PPQ.Payload.Response.ScheduleDTO;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
