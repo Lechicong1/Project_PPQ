@@ -1,8 +1,13 @@
 package com.example.PPQ.Entity;
 
+import com.example.PPQ.Payload.Request.RolesRequest;
 import jakarta.persistence.*;
 import jakarta.persistence.criteria.CriteriaBuilder;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "Roles")
 public class RolesEntity {
@@ -11,28 +16,10 @@ public class RolesEntity {
     private Integer id;
     private String roleName;
     private String Description;
-
-    public Integer getId() {
-        return id;
+    public RolesEntity() {
     }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getRoleName() {
-        return roleName;
-    }
-
-    public void setRoleName(String roleName) {
-        this.roleName = roleName;
-    }
-
-    public String getDescription() {
-        return Description;
-    }
-
-    public void setDescription(String description) {
-        Description = description;
+    public RolesEntity(RolesRequest req){
+        this.roleName = req.getRoleName();
+        this.Description = req.getDescription();
     }
 }

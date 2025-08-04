@@ -4,7 +4,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class UsersRequest {
     private int ID;
     @NotBlank(message = "UserName không được để trống")
@@ -17,35 +21,5 @@ public class UsersRequest {
     private String passWord;
     @NotNull(message = "Role không được để trống")
     private Integer idRoles;
-    public int getID() {
-        return ID;
-    }
-
-    public void setID(int ID) {
-        this.ID = ID;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getPassWord() {
-        return passWord;
-    }
-
-    public void setPassWord(String passWord) {
-        this.passWord = passWord;
-    }
-
-    public Integer getIdRoles() {
-        return idRoles;
-    }
-
-    public void setIdRoles(Integer idRoles) {
-        this.idRoles = idRoles;
-    }
+    
 }

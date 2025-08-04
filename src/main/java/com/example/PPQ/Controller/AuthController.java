@@ -38,7 +38,6 @@ import java.util.Map;
             @PostMapping("/login")
             public ResponseEntity<?> login(@Valid  @RequestBody LoginRequest loginRequest, HttpServletResponse response) {
                 HttpStatus status = HttpStatus.OK;
-
                 // Tạo đối tượng phản hồi
                 ResponseData responseData = new ResponseData();
                 try {
@@ -53,18 +52,9 @@ import java.util.Map;
                     if (authentication.isAuthenticated()) {
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                         String token = jwtCustom.createToken(authentication);
-                        // Tạo cookie chứa JWT
-                        Cookie jwtCookie = new Cookie("access_token", token);
-                        jwtCookie.setHttpOnly(true); // Bảo vệ khỏi JavaScript (XSS)
-                        jwtCookie.setSecure(false); // Bật nếu dùng HTTPS
-                        jwtCookie.setPath("/"); // Toàn hệ thống
-                        jwtCookie.setMaxAge(30 * 60); // 1 giờ (tuỳ thời gian sống của token)
-
-                        // Gửi cookie về client
-                        response.addCookie(jwtCookie);
                         responseData.setSuccess(true);
                         responseData.setMessage("Login successful");
-                        responseData.setData(jwtCookie);
+                        responseData.setData(token);
                     }
                 } catch (AuthenticationException ex) {
                     // Trường hợp xác thực thất bại
@@ -75,28 +65,7 @@ import java.util.Map;
                 }
                 return  ResponseEntity.status(status).body(responseData);
             }
-        @PostMapping("/logout")
-        public ResponseEntity<?> logout(HttpServletResponse response) {
-            ResponseData responseData = new ResponseData();
-            HttpStatus status = HttpStatus.OK;
-            try{
-                Cookie cookie = new Cookie("access_token", "");
-                cookie.setMaxAge(0); // Xoá ngay
-                cookie.setHttpOnly(true);
-                cookie.setSecure(false);
-                cookie.setPath("/");
-                response.addCookie(cookie);
-                responseData.setSuccess(true);
-                responseData.setMessage("Logout successful");
-                System.out.println("dang xuat thanh cong ");
-            }
-            catch(Exception e){
-                responseData.setSuccess(false);
-                responseData.setMessage("Logout fail");
-            }
 
-            return ResponseEntity.status(status).body(responseData);
-        }
 }
 
 

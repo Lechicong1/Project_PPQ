@@ -3,7 +3,8 @@ package com.example.PPQ.Controller;
 import com.example.PPQ.Payload.Request.RolesRequest;
 import com.example.PPQ.Payload.Response.ResponseData;
 import com.example.PPQ.Payload.Response.RolesDTO;
-import com.example.PPQ.ServiceImp.RolesService;
+import com.example.PPQ.Service.RoleService;
+import com.example.PPQ.ServiceImp.RolesServiceImp;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,7 @@ import java.util.List;
 @PreAuthorize("hasAuthority('ADMIN')")
 public class RolesController {
         @Autowired
-        RolesService role_service;
+        RoleService role_service;
         @PostMapping
         public ResponseEntity<?> addRoles(@Valid @RequestBody RolesRequest role) {
             ResponseData responseData = new ResponseData();

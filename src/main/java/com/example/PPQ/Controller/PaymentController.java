@@ -4,7 +4,7 @@ import com.example.PPQ.Payload.Request.PaymentRequest;
 import com.example.PPQ.Payload.Response.PaymentRespone;
 import com.example.PPQ.Payload.Response.QRRespone;
 import com.example.PPQ.Payload.Response.ResponseData;
-import com.example.PPQ.ServiceImp.PaymentService;
+import com.example.PPQ.ServiceImp.PaymentServiceImp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +17,7 @@ import java.util.List;
 @RequestMapping("/payment")
 public class PaymentController {
     @Autowired
-    PaymentService paymentService;
+    PaymentServiceImp paymentService;
     @PreAuthorize("hasAuthority('USER')")
     @PostMapping(value="/{idCourse}")
     public ResponseEntity<?> createPayment(@RequestBody PaymentRequest paymentRequest, @PathVariable  int idCourse) {

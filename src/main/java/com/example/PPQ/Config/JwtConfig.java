@@ -45,20 +45,20 @@ public class JwtConfig {
             }
         };
     }
-    @Bean
-    public BearerTokenResolver bearerTokenResolver() {
-        return request -> {
-            // Lấy token từ cookie có tên "access_token"
-            if (request.getCookies() != null) {
-                for (Cookie cookie : request.getCookies()) {
-                    if ("access_token".equals(cookie.getName())) {
-                        return cookie.getValue();
-                    }
-                }
-            }
-            return null;
-        };
-    }
+//    @Bean
+//    public BearerTokenResolver bearerTokenResolver() {
+//        return request -> {
+//            // Lấy token từ cookie có tên "access_token"
+//            if (request.getCookies() != null) {
+//                for (Cookie cookie : request.getCookies()) {
+//                    if ("access_token".equals(cookie.getName())) {
+//                        return cookie.getValue();
+//                    }
+//                }
+//            }
+//            return null;
+//        };
+//    }
 
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {

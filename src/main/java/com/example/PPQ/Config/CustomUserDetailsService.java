@@ -2,7 +2,7 @@ package com.example.PPQ.Config;
 
 import com.example.PPQ.Entity.RolesEntity;
 import com.example.PPQ.Entity.UserEntity;
-import com.example.PPQ.respository.Roles_respository;
+import com.example.PPQ.respository.RoleRepository;
 import com.example.PPQ.respository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -19,7 +19,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
     UsersRepository usersRepo;
     @Autowired
-    Roles_respository roles_respository;
+    RoleRepository roles_respository;
     @Autowired
     RedisTemplate redisTemplate;
     @Override

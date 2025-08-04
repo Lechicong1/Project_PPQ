@@ -3,7 +3,7 @@ package com.example.PPQ.Controller;
 import com.example.PPQ.Payload.Request.RegisterCourseRequest;
 import com.example.PPQ.Payload.Response.CourseRegisterRespone;
 import com.example.PPQ.Payload.Response.ResponseData;
-import com.example.PPQ.ServiceImp.RegisterCourseService;
+import com.example.PPQ.ServiceImp.RegisterCourseServiceImp;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,7 +18,7 @@ import java.util.List;
 @RequestMapping("/course/register")
 public class RegisterCourseController {
     @Autowired
-    RegisterCourseService registerCourseService;
+    RegisterCourseServiceImp registerCourseService;
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     @PostMapping(value = "/{idcourse}")
     public ResponseEntity<?> registerCourse(@PathVariable int idcourse,@Valid @RequestBody RegisterCourseRequest registerCourseRequest)

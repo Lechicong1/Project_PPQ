@@ -2,7 +2,7 @@ package com.example.PPQ.Controller;
 
 import com.example.PPQ.Payload.Request.registerRequest;
 import com.example.PPQ.Payload.Response.ResponseData;
-import com.example.PPQ.ServiceImp.RegisterService;
+import com.example.PPQ.ServiceImp.RegisterServiceImp;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/register")
 public class RegisterController {
     @Autowired
-    RegisterService registerService;
+    RegisterServiceImp registerService;
     @PostMapping
     public ResponseEntity<?> register(@Valid @RequestBody registerRequest registerRequest) {
         ResponseData responseData = new ResponseData();

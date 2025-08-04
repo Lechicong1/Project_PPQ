@@ -3,6 +3,7 @@ package com.example.PPQ.Controller;
 import com.example.PPQ.Payload.Request.ClassRequest;
 import com.example.PPQ.Payload.Response.ClassDTO;
 import com.example.PPQ.Payload.Response.ResponseData;
+import com.example.PPQ.Service.ClassService;
 import com.example.PPQ.ServiceImp.ClassServiceImp;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ import java.util.List;
 @RequestMapping("/classes")
 public class ClassController {
     @Autowired
-    ClassServiceImp classServiceImp;
+    ClassService classServiceImp;
     @GetMapping
     public ResponseEntity<?> getAllClasses() {
         ResponseData responseData = new ResponseData();

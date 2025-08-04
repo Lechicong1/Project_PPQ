@@ -5,8 +5,9 @@ import com.example.PPQ.Exception.ResourceNotFoundException;
 import com.example.PPQ.Payload.Request.TeacherRequest;
 import com.example.PPQ.Payload.Response.ResponseData;
 import com.example.PPQ.Payload.Response.TeacherDTO;
-import com.example.PPQ.ServiceImp.TeacherService;
-import com.example.PPQ.respository.TeacherRespository;
+import com.example.PPQ.Service.TeacherService;
+import com.example.PPQ.ServiceImp.TeacherServiceImp;
+import com.example.PPQ.respository.TeacherRepository;
 import com.example.PPQ.respository.UsersRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
@@ -26,7 +27,7 @@ import java.util.List;
 //@PreAuthorize("hasAuthority('ADMIN')")
 public class TeacherController {
     @Autowired
-    TeacherRespository teacherRespository;
+    TeacherRepository teacherRespository;
     @Autowired
     TeacherService teacherService;
     @Autowired

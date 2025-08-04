@@ -2,7 +2,7 @@ package com.example.PPQ.Config;
 
 import com.example.PPQ.Entity.RolesEntity;
 import com.example.PPQ.Entity.UserEntity;
-import com.example.PPQ.respository.Roles_respository;
+import com.example.PPQ.respository.RoleRepository;
 import com.example.PPQ.respository.UsersRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,7 +27,7 @@ public class oauth2Config implements AuthenticationSuccessHandler {
     @Autowired
     private UsersRepository usersRepository;
     @Autowired
-    Roles_respository roleRepo;
+    RoleRepository roleRepo;
     @Autowired
     JwtCustom jwtCustom;
     @Override

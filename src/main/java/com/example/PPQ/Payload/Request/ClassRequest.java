@@ -4,7 +4,11 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class ClassRequest {
     @NotBlank(message = "Tên lớp không được để trống")
     private String className;
@@ -19,52 +23,5 @@ public class ClassRequest {
     private String status;
     private String roadMap;
 
-    public String getRoadMap() {
-        return roadMap;
-    }
 
-    public void setRoadMap(String roadMap) {
-        this.roadMap = roadMap;
-    }
-
-    public String getClassName() {
-        return className;
-    }
-
-    public void setClassName(String className) {
-        this.className = className;
-    }
-
-    public Integer getIdCourses() {
-        return idCourses;
-    }
-
-    public void setIdCourses(Integer idCourses) {
-        this.idCourses = idCourses;
-    }
-
-    public Integer getIdTeachers() {
-        return idTeachers;
-    }
-
-    public void setIdTeachers(Integer idTeachers) {
-        this.idTeachers = idTeachers;
-    }
-
-    public Integer getMaxStudents() {
-        return maxStudents;
-    }
-
-    public void setMaxStudents(Integer maxStudents) {
-        this.maxStudents = maxStudents;
-    }
-
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
 }

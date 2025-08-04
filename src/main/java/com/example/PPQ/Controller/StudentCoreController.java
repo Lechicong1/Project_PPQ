@@ -3,7 +3,8 @@ package com.example.PPQ.Controller;
 import com.example.PPQ.Payload.Request.AttendanceRequest;
 import com.example.PPQ.Payload.Request.StudentCoreRequest;
 import com.example.PPQ.Payload.Response.ResponseData;
-import com.example.PPQ.ServiceImp.StudentCoreService;
+import com.example.PPQ.Service.StudentCoreService;
+import com.example.PPQ.ServiceImp.StudentCoreServiceImp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,7 @@ public class StudentCoreController {
     }
 
     @PutMapping()
-    public ResponseEntity<?> updateScore( @RequestBody List<AttendanceRequest> attendanceRequest) {
+    public ResponseEntity<?> updateAbsent( @RequestBody List<AttendanceRequest> attendanceRequest) {
         ResponseData responseData = new ResponseData();
         HttpStatus status = HttpStatus.OK;
         studentCoreService.updateAbsentStudent(attendanceRequest);

@@ -3,7 +3,11 @@ package com.example.PPQ.Payload.Request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class RegisterCourseRequest {
     @NotBlank(message = "Họ tên không được để trống")
     private String fullName;
@@ -16,27 +20,4 @@ public class RegisterCourseRequest {
     @NotNull(message = "Lớp học không được để trống")
     private int idClass;
 
-    public int getIdClass() {
-        return idClass;
-    }
-
-    public void setIdClass(int idClass) {
-        this.idClass = idClass;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
 }

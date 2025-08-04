@@ -3,7 +3,8 @@ package com.example.PPQ.Controller;
 import com.example.PPQ.Payload.Request.ScheduleRequest;
 import com.example.PPQ.Payload.Response.ResponseData;
 import com.example.PPQ.Payload.Response.ScheduleDTO;
-import com.example.PPQ.ServiceImp.ScheduleService;
+import com.example.PPQ.Service.ScheduleService;
+import com.example.PPQ.ServiceImp.ScheduleServiceImp;
 import com.example.PPQ.respository.UsersRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,16 +46,7 @@ public class ScheduleController {
         status = HttpStatus.OK;
         return ResponseEntity.status(status).body(responseData);
     }
-    @GetMapping(value="/{id}")
-    public ResponseEntity<?> getScheduleById(@PathVariable int id) {
-        ResponseData responseData = new ResponseData();
-        HttpStatus status ;
-        ScheduleDTO schedule_dto = scheduleService.getScheduleById(id);
-            responseData.setData(schedule_dto);
-            responseData.setSuccess(Boolean.TRUE);
-            status = HttpStatus.OK;
-        return ResponseEntity.status(status).body(responseData);
-    }
+
     @PreAuthorize("hasAuthority('STUDENT')")
     @GetMapping("/myScheduleStudent")
     public ResponseEntity<?> getScheduleForStudent(){

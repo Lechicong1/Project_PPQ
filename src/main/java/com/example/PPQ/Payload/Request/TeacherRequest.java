@@ -4,9 +4,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Pattern;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
-
+@Getter
+@Setter
 public class TeacherRequest {
     @NotBlank(message = "Tên giáo viên không được để trống")
     private String fullName;
@@ -22,62 +25,5 @@ public class TeacherRequest {
     private Integer idUsers;
     @NotBlank(message = "email không được để trống ")
     private String email;
-//    @NotNull(message = "Ngày bắt đầu làm việc không được để trống")
-//    @PastOrPresent(message = "Ngày bắt đầu làm việc phải là ngày hiện tại hoặc trong quá khứ")
-//    private LocalDate startDate;
-    public String getFullName() {
-        return fullName;
-    }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-//
-//    public LocalDate getStartDate() {
-//        return startDate;
-//    }
-//
-//    public void setStartDate(LocalDate startDate) {
-//        this.startDate = startDate;
-//    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public String getEducationLevel() {
-        return educationLevel;
-    }
-
-    public void setEducationLevel(String educationLevel) {
-        this.educationLevel = educationLevel;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Integer getIdUsers() {
-        return idUsers;
-    }
-
-    public void setIdUsers(Integer idUsers) {
-        this.idUsers = idUsers;
-    }
 }

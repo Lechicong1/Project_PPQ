@@ -4,9 +4,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
-
+@Getter
+@Setter
 @Entity
 @Table(name = "CourseStudentClass")
 @IdClass(CourseStudentKey.class)
@@ -19,35 +22,5 @@ public class CourseStudentClassEntity {
     private Integer idClass;
     private LocalDateTime enrollmentDate;
 
-    public Integer getIdCourse() {
-        return idCourse;
-    }
 
-    public void setIdCourse(Integer idCourse) {
-        this.idCourse = idCourse;
-    }
-
-    public Integer getIdStudent() {
-        return idStudent;
-    }
-
-    public void setIdStudent(Integer idStudent) {
-        this.idStudent = idStudent;
-    }
-
-    public Integer getIdClass() {
-        return idClass;
-    }
-
-    public void setIdClass(Integer idClass) {
-        this.idClass = idClass;
-    }
-
-    public LocalDateTime getEnrollmentDate() {
-        return enrollmentDate;
-    }
-
-    public void setEnrollmentDate(LocalDateTime enrollmentDate) {
-        this.enrollmentDate = enrollmentDate;
-    }
 }

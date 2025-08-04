@@ -1,6 +1,8 @@
 package com.example.PPQ.Exception;
 
 import com.example.PPQ.Payload.Response.ResponseData;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -11,7 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestControllerAdvice
-
+@Slf4j
 public class GlobalException {
     @ExceptionHandler(value = InvalidInputException.class)
     public ResponseEntity<?> invalidInput(InvalidInputException e) {
@@ -30,13 +32,19 @@ public class GlobalException {
         return ResponseEntity.badRequest().body(responseData); // 400
     }
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleUnknown(Exception e) {
-        System.out.println(e.getMessage());
+    public ResponseEntity<?> handleUnknownException(Exception e, HttpServletRequest request) {
+        // Ghi log chi tiết
+        log.error("💥 Unhandled exception at [{} {}]: {}",
+                request.getMethod(),
+                request.getRequestURI(),
+                e.getMessage(), e);
+
+        // Tạo response trả về client
         ResponseData responseData = new ResponseData();
         responseData.setSuccess(false);
-        responseData.setMessage(" Đã xảy ra lỗi hệ thống, vui lòng thử lại sau " );
+        responseData.setMessage("Đã xảy ra lỗi hệ thống, vui lòng thử lại sau");
         responseData.setData(null);
-        return ResponseEntity.internalServerError().body(responseData);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseData);
     }
     // Xảy ra khi parse dữ liệu từ url param bị lỗi
     @ExceptionHandler(value = MethodArgumentTypeMismatchException.class)
@@ -55,6 +63,7 @@ public class GlobalException {
     // Xảy ra khi parse dữ liệu từ JSON sang object thất bại (ví dụ: sai định dạng JSON)
     @ExceptionHandler(value = HttpMessageNotReadableException.class)
     public ResponseEntity<?> handleInvalidInput(HttpMessageNotReadableException ex) {
+        log.error("Unhandled exception caught in controller: {}", ex.getMessage(), ex);
         ResponseData responseData = new ResponseData();
         responseData.setSuccess(false);
         responseData.setMessage("Dữ liệu đầu vào không hợp lệ. Vui lòng kiểm tra định dạng JSON.");

@@ -4,9 +4,12 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
-
+@Getter
+@Setter
 public class CourseRequest {
     @NotBlank(message = "Tên khóa học không được để trống")
     private String nameCourse;
@@ -20,43 +23,5 @@ public class CourseRequest {
     @NotBlank(message = "Ngôn ngữ không được để trống")
     private String language;
 
-    public Integer getNumberSessions() {
-        return numberSessions;
-    }
 
-    public void setNumberSessions(Integer numberSessions) {
-        this.numberSessions = numberSessions;
-    }
-
-    public String getLanguage() {
-        return language;
-    }
-
-    public void setLanguage(String language) {
-        this.language = language;
-    }
-
-    public String getNameCourse() {
-        return nameCourse;
-    }
-
-    public void setNameCourse(String nameCourse) {
-        this.nameCourse = nameCourse;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public BigDecimal getFee() {
-        return fee;
-    }
-
-    public void setFee(BigDecimal fee) {
-        this.fee = fee;
-    }
 }

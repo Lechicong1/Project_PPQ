@@ -1,9 +1,13 @@
 package com.example.PPQ.Entity;
 
+import com.example.PPQ.Payload.Request.ScheduleRequest;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalTime;
-
+@Getter
+@Setter
 @Entity
 @Table(name = "Schedule")
 public class ScheduleEntity {
@@ -15,52 +19,14 @@ public class ScheduleEntity {
     private LocalTime startTime;
     private LocalTime endTime;
     private String thu;
+    public ScheduleEntity() {}
+    public ScheduleEntity(ScheduleRequest req){
+        this.idClass = req.getIdClass();
+        this.nameRoom = req.getNameRoom();
+        this.startTime = req.getStartTime();
+        this.endTime = req.getEndTime();
+        this.thu = req.getThu();
 
-    public LocalTime getEndTime() {
-        return endTime;
     }
 
-    public void setEndTime(LocalTime endTime) {
-        this.endTime = endTime;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getIdClass() {
-        return idClass;
-    }
-
-    public void setIdClass(Integer idClass) {
-        this.idClass = idClass;
-    }
-
-    public String getNameRoom() {
-        return nameRoom;
-    }
-
-    public void setNameRoom(String nameRoom) {
-        this.nameRoom = nameRoom;
-    }
-
-    public LocalTime getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(LocalTime startTime) {
-        this.startTime = startTime;
-    }
-
-    public String getThu() {
-        return thu;
-    }
-
-    public void setThu(String thu) {
-        this.thu = thu;
-    }
 }

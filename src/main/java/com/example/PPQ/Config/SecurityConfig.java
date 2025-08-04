@@ -17,6 +17,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -42,8 +43,7 @@ public class SecurityConfig {
     }
     @Autowired
     oauth2Config successHandler;
-    @Autowired
-    BearerTokenResolver bearerTokenResolver;
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -53,7 +53,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // ✅ Cho phép preflight CORS
-                        .requestMatchers("/login","/register","courses/{courseId}","/logout","/otp/**").permitAll()
+                        .requestMatchers("/login","/register","courses/{courseId}","/otp/**").permitAll()
                         .requestMatchers("/upload/**","/contact","/courses/languages").permitAll()
                          .requestMatchers(HttpMethod.GET, "/courses").permitAll()
                         .requestMatchers(HttpMethod.GET, "/teachers").permitAll()
@@ -65,7 +65,7 @@ public class SecurityConfig {
                                     .decoder(jwtDecoder) // gọi hàm JwtDecoder đã khai báo @Bean
                                     .jwtAuthenticationConverter(jwtAuthenticationConverter) // gọi hàm phân quyền
                             )
-                            .bearerTokenResolver(bearerTokenResolver) // 🔑 lấy token từ cookie
+
                     )
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/oauth2/authorization/google")

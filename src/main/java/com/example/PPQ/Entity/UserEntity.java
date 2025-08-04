@@ -2,46 +2,24 @@ package com.example.PPQ.Entity;
 
 import jakarta.persistence.*;
 import jakarta.persistence.criteria.CriteriaBuilder;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
+@Builder
 @Entity
 @Table(name = "Users")
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int ID;
+    private int Id;
     private String username;
     private String password;
     private Integer idRoles;
 
-    public Integer getId() {
-        return ID;
+    public UserEntity() {
     }
 
-    public void setId(Integer id) {
-        this.ID = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Integer getIdRoles() {
-        return idRoles;
-    }
-
-    public void setIdRoles(Integer idRoles) {
-        this.idRoles = idRoles;
-    }
 }
