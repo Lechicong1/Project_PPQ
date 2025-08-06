@@ -1,0 +1,45 @@
+version: "3.9"
+
+services:
+  backend:
+    build: .
+    image: lechicong01/springppq:latest
+    container_name: springppq-backend
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: jdbc:mysql://mysqljava:3306/PPQ
+      BASE_URL: http://localhost:8080
+      DB_USER: root
+      DB_PASS: admin123
+      REDIS_HOST: redis
+      REDIS_PORT: 6380
+    depends_on:
+      - mysqljava
+      - redis
+    networks:
+      - ppq-network
+
+  mysqljava:
+    image: mysql:8.0
+    container_name: mysqljava
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: admin123
+      MYSQL_DATABASE: PPQ
+    ports:
+      - "3306:3306"
+    networks:
+      - ppq-network
+
+  redis:
+    image: redis:7.2
+    container_name: redis
+    ports:
+      - "6380:6379"
+    networks:
+      - ppq-network
+
+networks:
+  ppq-network:
+    driver: bridge

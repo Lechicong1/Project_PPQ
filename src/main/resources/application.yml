@@ -31,7 +31,7 @@ spring:
     resources:
       static-locations:
         - classpath:/static/
-        - file:upload/
+        - file:../../upload/
 
 
   mail:

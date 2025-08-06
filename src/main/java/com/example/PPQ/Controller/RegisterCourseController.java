@@ -19,24 +19,6 @@ import java.util.List;
 public class RegisterCourseController {
     @Autowired
     RegisterCourseServiceImp registerCourseService;
-    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
-    @PostMapping(value = "/{idcourse}")
-    public ResponseEntity<?> registerCourse(@PathVariable int idcourse,@Valid @RequestBody RegisterCourseRequest registerCourseRequest)
-    {
-        ResponseData responseData = new ResponseData();
-        HttpStatus status = HttpStatus.OK;
-        if(registerCourseService.RegisterCourse(idcourse, registerCourseRequest)){
-
-            responseData.setMessage("Successfully registered");
-            responseData.setSuccess(Boolean.TRUE);
-        }
-        else{
-            responseData.setMessage("Failed to register");
-            responseData.setSuccess(Boolean.FALSE);
-            status = HttpStatus.NOT_FOUND;
-        }
-        return ResponseEntity.status(status).body(responseData);
-    }
 
     @GetMapping
     public ResponseEntity<?> getAllCourseRegister(){

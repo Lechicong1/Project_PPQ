@@ -10,6 +10,7 @@ import com.example.PPQ.respository.RoleRepository;
 import com.example.PPQ.respository.UsersRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 @Service
@@ -34,7 +35,13 @@ public class RegisterServiceImp implements com.example.PPQ.Service.RegisterServi
             user.setUsername(request.getUsername());
             user.setPassword(passwordEncoder.encode(request.getPassword()));
             user.setIdRoles(roleDefault.getId());
-            users_repository.save(user);
+            try{
+                users_repository.save(user);
+            }
+            catch (DataIntegrityViolationException e){
+                throw new DuplicateResourceException("Người dùng đã tồn tại");
+            }
+
         }
         else{
             throw new InvalidInputException("Mật khẩu xác nhận không trùng với mật khẩu trước đó ");

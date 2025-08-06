@@ -8,13 +8,14 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Builder
+
 @Entity
 @Table(name = "Users")
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int Id;
+    @Column(unique = true, nullable = false)
     private String username;
     private String password;
     private Integer idRoles;
