@@ -1,6 +1,6 @@
 package com.example.PPQ.Entity;
 
-import com.example.PPQ.Payload.Response.CourseDTO;
+import com.example.PPQ.Payload.Request.CourseRequest;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,5 +21,14 @@ public class CourseEntity {
     private Integer numberSessions;
     private String language;
     private String imagePath;
+    public CourseEntity(CourseRequest courseRequest) {
+        this.nameCourse = courseRequest.getNameCourse();
+        this.Description = courseRequest.getDescription();
+        this.Fee = courseRequest.getFee();
+        this.numberSessions = courseRequest.getNumberSessions();
+        this.language = courseRequest.getLanguage();
+
+    }
+    public CourseEntity() {}
 
 }

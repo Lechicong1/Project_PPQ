@@ -6,6 +6,9 @@ import com.example.PPQ.Exception.ResourceNotFoundException;
 import com.example.PPQ.Payload.Request.CourseRequest;
 import com.example.PPQ.Payload.Response.CourseDTO;
 import com.example.PPQ.Payload.Projection_Interface.CourseView;
+import com.example.PPQ.Payload.Response.PageResponse;
+import com.example.PPQ.Service.CourseService;
+import com.example.PPQ.Service.FileStorageService;
 import com.example.PPQ.respository.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -13,6 +16,10 @@ import org.jsoup.nodes.Entities;
 import org.jsoup.safety.Safelist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -29,7 +36,7 @@ import java.util.*;
 
 @Service
 @Transactional
-public class CourseServiceImp implements com.example.PPQ.Service.CourseService {
+public class CourseServiceImp implements CourseService {
     @Autowired
     CourseRepository courseRespository;
     @Autowired
@@ -40,8 +47,11 @@ public class CourseServiceImp implements com.example.PPQ.Service.CourseService {
     UsersRepository usersRepository;
     @Autowired
     StudentRepository studentRespository;
+    @Autowired
+    FileStorageService fileStorageService;
     @Value("${app.base-url}")
     private String baseUrl;
+
     private String sanitizeHtml(String html) {
         if (html == null || html.isEmpty()) {
             return "";
@@ -62,102 +72,80 @@ public class CourseServiceImp implements com.example.PPQ.Service.CourseService {
 
         return Jsoup.clean(html, "", safelist, outputSettings);
     }
+    private Sort getSortFromOption(String sortOption) {
+        return switch (sortOption) {
+            case "name_asc" -> Sort.by("nameCourse").ascending();
+            case "name_desc" -> Sort.by("nameCourse").descending();
+            case "price_asc" -> Sort.by("Fee").ascending();
+            case "price_desc" -> Sort.by("Fee").descending();
+            case "session_desc" -> Sort.by("numberSession").descending();
+            default -> Sort.by("nameCourse").ascending();
+        };
+    }
+
     @Override
-    public List<CourseDTO> getAllCourses() {
-        List<CourseDTO> listcourse_dto = new ArrayList<>();
-        List<CourseEntity> listCourses=courseRespository.findAll();
-        if(listCourses.isEmpty())
-            throw new ResourceNotFoundException("Khóa học không tồn tại ");
-        String Url =baseUrl+ "/upload/courses/";
-        for(CourseEntity c:listCourses){
-            CourseDTO course_dto=new CourseDTO(c);
-            course_dto.setImagePath(Url+c.getImagePath());
-            listcourse_dto.add(course_dto);
+    public PageResponse<CourseDTO> getAllCourses(String language, Integer page, Integer size , String sortOption) {
+        Sort sort = getSortFromOption(sortOption);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<CourseEntity> coursePageEntity;
+        if (language != null && !language.isEmpty()) {
+            coursePageEntity = courseRespository.findByLanguage(language, pageable);
+        } else {
+            coursePageEntity = courseRespository.findAll(pageable);
         }
 
-        return listcourse_dto;
+        String Url = baseUrl + "/upload/courses/";
+        Page<CourseDTO> courseDTOPage = coursePageEntity.map(courseEntity -> {
+               CourseDTO c= new CourseDTO(courseEntity);
+               c.setImagePath(Url+courseEntity.getImagePath());
+               return c;
+        });
+        return new PageResponse<>(courseDTOPage);
     }
 
     @Override
     public CourseDTO getCourseByID(int id) {
-        String Url =baseUrl+ "/upload/courses/";
-        CourseEntity courseEntity=courseRespository.findById(id).orElseThrow(()->new ResourceNotFoundException("Khóa học không tồn tại "));
-        CourseDTO course_dto=new CourseDTO(courseEntity);
-        course_dto.setImagePath(Url+courseEntity.getImagePath());
+        String Url = baseUrl + "/upload/courses/";
+        CourseEntity courseEntity = courseRespository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Khóa học không tồn tại "));
+        CourseDTO course_dto = new CourseDTO(courseEntity);
+        course_dto.setImagePath(Url + courseEntity.getImagePath());
         return course_dto;
     }
 
     @Override
-    public void addCourse(CourseRequest courseRequest, MultipartFile file ) {
-            // Lưu ảnh vào thư mục
-            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-            Path uploadPath = Paths.get("upload/courses");
-            try {
-                if (!Files.exists(uploadPath)) {
-                    Files.createDirectories(uploadPath);
-                }
-                // Làm sạch HTML
-                String safeDescription = sanitizeHtml(courseRequest.getDescription());
-                Path filePath = uploadPath.resolve(fileName);
-                Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-                CourseEntity courseEntity = new CourseEntity();
-                courseEntity.setNameCourse(courseRequest.getNameCourse());
-                courseEntity.setFee(courseRequest.getFee());
-                courseEntity.setDescription(safeDescription);
-                courseEntity.setImagePath(fileName);
-                courseEntity.setNumberSessions(courseRequest.getNumberSessions());
-                courseEntity.setLanguage(courseRequest.getLanguage());
-                courseRespository.save(courseEntity);
-            }
-              catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
+    public void addCourse(CourseRequest courseRequest, MultipartFile file) {
+        // Lưu ảnh vào thư mục
+        String fileName = fileStorageService.saveFile(file, "course");
+        // Làm sạch HTML
+        String safeDescription = sanitizeHtml(courseRequest.getDescription());
+        CourseEntity courseEntity = new CourseEntity(courseRequest);
+        courseEntity.setImagePath(fileName);
+        courseRespository.save(courseEntity);
     }
+
     @Override
-    public void updateCourse(int id, CourseRequest courseRequest,MultipartFile file) {
+    public void updateCourse(int id, CourseRequest courseRequest, MultipartFile file) {
+        CourseEntity courseEntity = courseRespository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Khóa học không tồn tại "));
+        if (courseRequest.getNameCourse() != null) courseEntity.setNameCourse(courseRequest.getNameCourse());
 
-        try{
-            CourseEntity courseEntity=courseRespository.findById(id).orElseThrow(()->new ResourceNotFoundException("Khóa học không tồn tại ") );
-            if(courseRequest.getNameCourse()!=null) courseEntity.setNameCourse(courseRequest.getNameCourse());
-
-            if(courseRequest.getDescription()!=null){
-                String safeDescription = sanitizeHtml(courseRequest.getDescription());
-                courseEntity.setDescription(safeDescription);
-
-            }
-            if(courseRequest.getFee()!=null) courseEntity.setFee(courseRequest.getFee());
-
-            if(courseRequest.getLanguage()!=null) courseEntity.setLanguage(courseRequest.getLanguage());
-
-            if(courseRequest.getNumberSessions()!=null) courseEntity.setNumberSessions(courseRequest.getNumberSessions());
-
-            // Xử lý ảnh
-            String imagePath = courseEntity.getImagePath(); // Giữ imagePath cũ làm mặc định
-            if (file != null && !file.isEmpty()) {
-                String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-                Path uploadPath = Paths.get("upload/courses");
-                if (!Files.exists(uploadPath)) {
-                    Files.createDirectories(uploadPath);
-                }
-                Path filePath = uploadPath.resolve(fileName);
-                Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-                imagePath = fileName; //ten file anh
-                courseEntity.setImagePath(imagePath);
-            } else {
-                // Giữ đường dẫn đầy đủ nếu có
-                imagePath = courseEntity.getImagePath() != null ? "/upload/courses/" + courseEntity.getImagePath() : null;
-            }
-            courseRespository.save(courseEntity);
-
-
+        if (courseRequest.getDescription() != null) {
+            String safeDescription = sanitizeHtml(courseRequest.getDescription());
+            courseEntity.setDescription(safeDescription);
         }
-        catch(Exception e){
-            System.out.println("co loi khi sua course "+ e.getMessage());
+        if (courseRequest.getFee() != null) courseEntity.setFee(courseRequest.getFee());
+        if (courseRequest.getLanguage() != null) courseEntity.setLanguage(courseRequest.getLanguage());
+        if (courseRequest.getNumberSessions() != null)
+            courseEntity.setNumberSessions(courseRequest.getNumberSessions());
 
+        // Xử lý ảnh
+        String imagePath = courseEntity.getImagePath(); // Giữ imagePath cũ làm mặc định
+        if (file != null && !file.isEmpty()) {
+            String fileName = fileStorageService.saveFile(file, "course");
+            imagePath = fileName; //ten file anh
         }
+        if (imagePath != null) courseEntity.setImagePath(imagePath);
+        courseRespository.save(courseEntity);
+
     }
 
     @Override
@@ -166,54 +154,32 @@ public class CourseServiceImp implements com.example.PPQ.Service.CourseService {
         classRespository.deleteClassByIdCourses(id);
         // xoa bản ghi liên quan đến khóa học trong coursestudentclass
         courseStudentClassRepository.deleteCourseStudentClassByIdCourses(id);
-
-        CourseEntity course_delete=courseRespository.findById(id).orElseThrow(()->new ResourceNotFoundException("Không tồn tại khóa học "));
+        CourseEntity course_delete = courseRespository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Không tồn tại khóa học "));
         // Lấy tên file ảnh
-        String fileName = course_delete.getImagePath(); // ví dụ: "abc123.jpg"
-        String fullPath = "upload/courses/" + fileName;
-        //xoa anh
-        File file = new File(fullPath);
-        if (file.exists()) {
-            file.delete();
-        }
+        String fileName = course_delete.getImagePath();
+        fileStorageService.deleteFile("teachers", fileName);
         courseRespository.deleteById(id);
-
     }
 
     @Override
     public List<String> getAllLanguages() {
-        List<String> languages= courseRespository.getAllLanguages();
+        List<String> languages = courseRespository.getAllLanguages();
         return languages;
     }
 
-    @Override
-    public List<CourseDTO> getAllCoursesByLanguage(String language) {
-        List<CourseDTO> listcourse_dto = new ArrayList<>();
-        List<CourseEntity> course=courseRespository.findByLanguage(language);
-        if(course.isEmpty())
-            throw new ResourceNotFoundException("Khóa học không tồn tại ");
-        String Url =baseUrl+ "/upload/courses/";
-        for(CourseEntity c:course){
-            CourseDTO course_dto=new CourseDTO(c);
-            course_dto.setImagePath(Url+c.getImagePath());
-            listcourse_dto.add(course_dto);
-        }
-
-        return listcourse_dto;
-    }
 
     @Override
     public List<CourseDTO> getCourseByIdStudent() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username=auth.getName();
+        String username = auth.getName();
         StudentEntity student = studentRespository.findByUserName(username);
-        if(student==null) throw new ResourceNotFoundException("Học sinh không tồn tại");
-        List<CourseView> courseView=courseRespository.findCourseByIdStudent(student.getId());
-        if(courseView.isEmpty()){
+        if (student == null) throw new ResourceNotFoundException("Học sinh không tồn tại");
+        List<CourseView> courseView = courseRespository.findCourseByIdStudent(student.getId());
+        if (courseView.isEmpty()) {
             throw new ResourceNotFoundException("Bạn chưa đăng kí khóa học nào");
         }
-        List<CourseDTO> course_response=new ArrayList<>();
-        for(CourseView c:courseView){
+        List<CourseDTO> course_response = new ArrayList<>();
+        for (CourseView c : courseView) {
             CourseDTO courseStudent = new CourseDTO();
             courseStudent.setNameCourse(c.getNameCourse());
             courseStudent.setFee(c.getFee());
@@ -232,12 +198,11 @@ public class CourseServiceImp implements com.example.PPQ.Service.CourseService {
             courseStudent.setScoreHomework(scoreHomework);
             courseStudent.setAbsentDays(absent);
             courseStudent.setAttentedDay(attented);
-            Float totalScore = ( score1 + score2 + 2*score3 + scoreHomework) / 5f;
+            Float totalScore = (score1 + score2 + 2 * score3 + scoreHomework) / 5f;
             courseStudent.setTotalScore(totalScore);
-            if(totalScore < 6  || absent > 4  ){
+            if (totalScore < 6 || absent > 4) {
                 courseStudent.setResult("fail");
-            }
-            else{
+            } else {
                 courseStudent.setResult("pass");
             }
             course_response.add(courseStudent);

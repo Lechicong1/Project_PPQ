@@ -6,10 +6,15 @@ import com.example.PPQ.Exception.ResourceNotFoundException;
 import com.example.PPQ.Payload.Projection_Interface.UserView;
 import com.example.PPQ.Payload.Request.UsersRequest;
 import com.example.PPQ.Payload.Request.changePasswordRequest;
+
+import com.example.PPQ.Payload.Response.PageResponse;
 import com.example.PPQ.Payload.Response.UserDTO;
 import com.example.PPQ.Service.UserService;
 import com.example.PPQ.respository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -46,11 +51,11 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public List<UserDTO> getAllUsers() {
-        List<UserView> listUsers = users_repository.getAllUsersBasic();
-        return listUsers.stream()
-                .map(user -> new UserDTO(user))
-                .collect(Collectors.toList());
+    public PageResponse<UserDTO> getAllUsers(Integer page , Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<UserView> listUsersPage = users_repository.getAllUsersPagination(pageable);
+        Page<UserDTO> userDTOPage = listUsersPage.map(UserDTO::new);
+        return new PageResponse<UserDTO>(userDTOPage);
     }
 
     @Override
@@ -131,12 +136,11 @@ public class UserServiceImp implements UserService {
         users_repository.save(users);
     }
     @Override
-
-    public List<UserDTO> findUserByUsernameAndRole(String username,Integer idRole) {
-        List<UserView> listuser = users_repository.findByUsernameAndRoles(username,idRole);
-        return listuser.stream()
-                .map(c-> new UserDTO(c))
-                .collect(Collectors.toList());
+    public PageResponse<UserDTO> findUserByUsernameAndRole(String username,Integer idRole, Integer page,Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<UserView> listuser = users_repository.searchUsersWithPagination(username,idRole,pageable );
+        Page<UserDTO> listUserDto = listuser.map(c->new UserDTO(c));
+        return new PageResponse<>(listUserDto);
     }
 
 

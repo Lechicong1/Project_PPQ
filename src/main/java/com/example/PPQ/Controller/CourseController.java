@@ -2,6 +2,7 @@ package com.example.PPQ.Controller;
 
 import com.example.PPQ.Payload.Request.CourseRequest;
 import com.example.PPQ.Payload.Response.CourseDTO;
+import com.example.PPQ.Payload.Response.PageResponse;
 import com.example.PPQ.Payload.Response.ResponseData;
 import com.example.PPQ.Service.CourseService;
 import com.example.PPQ.ServiceImp.CourseServiceImp;
@@ -45,18 +46,15 @@ public class CourseController {
         status = HttpStatus.OK;
         return ResponseEntity.status(status).body(responseData);
     }
-
     @GetMapping
-    public ResponseEntity<?> getAllCourses(@RequestParam(required = false) String languages) {
+    public ResponseEntity<?> getAllCourses(@RequestParam(required = false) String languages,
+                                           @RequestParam Integer page,
+                                           @RequestParam Integer size,
+                                           @RequestParam(required = false) String sort) {
         ResponseData responseData = new ResponseData();
         HttpStatus status = HttpStatus.OK;
-        List<CourseDTO> course_dto = new ArrayList<>();
-        if (languages != null) {
-            course_dto = courseService.getAllCoursesByLanguage(languages);
-        } else {
-            course_dto = courseService.getAllCourses();
-        }
-        responseData.setData(course_dto);
+        PageResponse<CourseDTO> pageCourse =courseService.getAllCourses(languages, page - 1,size,sort);
+        responseData.setData(pageCourse);
         responseData.setSuccess(Boolean.TRUE);
         status = HttpStatus.OK;
         return ResponseEntity.status(status).body(responseData);

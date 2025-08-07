@@ -2,6 +2,8 @@ package com.example.PPQ.respository;
 
 import com.example.PPQ.Entity.StudentEntity;
 import com.example.PPQ.Payload.Projection_Interface.StudentCoreView;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -44,4 +46,6 @@ public interface StudentRepository extends JpaRepository<StudentEntity,Integer> 
             "set cl.currentStudents = cl.currentStudents-1\n" +
             "WHERE c.idStudent = :idStudent",nativeQuery = true)
     void decreaseCurrentStudent(int idStudent);
+
+    Page<StudentEntity> findAll(Pageable pageable);
 }

@@ -9,7 +9,7 @@ public class ResponseData {
     private Object data;
     private String message;
     private boolean success=false;
-    private String imagePath;
+
 
 
 }

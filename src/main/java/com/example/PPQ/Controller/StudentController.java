@@ -1,6 +1,7 @@
 package com.example.PPQ.Controller;
 
 import com.example.PPQ.Payload.Request.StudentRequest;
+import com.example.PPQ.Payload.Response.PageResponse;
 import com.example.PPQ.Payload.Response.ResponseData;
 import com.example.PPQ.Payload.Response.StudentDTO;
 import com.example.PPQ.Service.StudentService;
@@ -21,11 +22,11 @@ public class StudentController {
     @Autowired
     StudentService studentService;
     @GetMapping
-    public ResponseEntity<?> getAllStudents() {
+    public ResponseEntity<?> getAllStudents(@RequestParam Integer page, @RequestParam Integer size) {
         ResponseData responseData = new ResponseData();
         HttpStatus status = HttpStatus.OK;
-        List<StudentDTO> student_dto=studentService.getAllStudents();
-            responseData.setData(student_dto);
+        PageResponse<StudentDTO> pageStudentReponse=studentService.getAllStudents(page-1, size);
+            responseData.setData(pageStudentReponse);
             responseData.setSuccess(Boolean.TRUE);
             status = HttpStatus.OK;
         return ResponseEntity.status(status).body(responseData);

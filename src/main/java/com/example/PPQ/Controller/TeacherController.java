@@ -37,28 +37,29 @@ public class TeacherController {
     public ResponseEntity<?> getAllTeachers() {
         ResponseData responseData = new ResponseData();
         HttpStatus status = HttpStatus.OK;
-        List<TeacherDTO> teacher_dto =teacherService.getAllTeacher();
-            responseData.setData(teacher_dto);
-            responseData.setSuccess(Boolean.TRUE);
-            status = HttpStatus.OK;
+        List<TeacherDTO> teacher_dto = teacherService.getAllTeacher();
+        responseData.setData(teacher_dto);
+        responseData.setSuccess(Boolean.TRUE);
+        status = HttpStatus.OK;
         return ResponseEntity.status(status).body(responseData);
     }
+
     @PreAuthorize("hasAuthority('TEACHER')")
     @GetMapping("/myInfo")
     public ResponseEntity<?> myInfo() {
         ResponseData responseData = new ResponseData();
-        HttpStatus status ;
+        HttpStatus status;
         TeacherDTO teacher_dto = teacherService.myInfo();
-            responseData.setData(teacher_dto);
-            responseData.setSuccess(Boolean.TRUE);
-            responseData.setMessage("Hiện thông tin thành công ");
-            status = HttpStatus.OK;
+        responseData.setData(teacher_dto);
+        responseData.setSuccess(Boolean.TRUE);
+        responseData.setMessage("Hiện thông tin thành công ");
+        status = HttpStatus.OK;
         return ResponseEntity.status(status).body(responseData);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> addTeacher( @Valid  @RequestPart("teacherRequest") String teacherRequestStr,@RequestPart("file") MultipartFile file) {
+    public ResponseEntity<?> addTeacher(@Valid @RequestPart("teacherRequest") String teacherRequestStr, @RequestPart("file") MultipartFile file) {
         ObjectMapper objectMapper = new ObjectMapper();
         TeacherRequest teacherRequest = null;
         try {
@@ -70,14 +71,16 @@ public class TeacherController {
         }
         ResponseData responseData = new ResponseData();
         HttpStatus status;
-        teacherService.addTeacher(teacherRequest, file) ;
-            responseData.setSuccess(Boolean.TRUE);
-            status = HttpStatus.CREATED;
-            responseData.setMessage("Thêm giáo viên thành công");
+        teacherService.addTeacher(teacherRequest, file);
+        responseData.setSuccess(Boolean.TRUE);
+        status = HttpStatus.CREATED;
+        responseData.setMessage("Thêm giáo viên thành công");
         return ResponseEntity.status(status).body(responseData);
     }
+
     @Value("${app.base-url}")
     private String baseUrl;
+
     @PreAuthorize("hasAuthority('TEACHER') or hasAuthority('ADMIN')")
     @PutMapping(value = "/{id}")
     public ResponseEntity<?> updateTeacher(@PathVariable int id, @Valid @RequestPart("teacherRequest") String teacherRequestStr, @RequestPart(value = "file", required = false) MultipartFile file) {
@@ -92,28 +95,23 @@ public class TeacherController {
         }
         ResponseData responseData = new ResponseData();
         HttpStatus status = HttpStatus.OK;
-
-      teacherService.updateTeacher(id, teacherRequest, file) ;
-            // Lấy thông tin giáo viên sau khi cập nhật
-            TeacherEntity updatedTeacher = teacherRespository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Giáo viên không tồn tại"));
-            responseData.setSuccess(true);
-            status = HttpStatus.OK;
-            responseData.setMessage("Cập nhật giáo viên thành công");
-            String Url = baseUrl+"/upload/teachers/";
-            responseData.setImagePath(Url+updatedTeacher.getImagePath()); // Đường dẫn đầy đủ
-            responseData.setData(null); // Không cần data nếu chỉ dùng imagePath
+        teacherService.updateTeacher(id, teacherRequest, file);
+        responseData.setSuccess(true);
+        status = HttpStatus.OK;
+        responseData.setMessage("Cập nhật giáo viên thành công");
+        responseData.setData(null);
         return ResponseEntity.status(status).body(responseData);
     }
+
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<?> deleteTeacher(@PathVariable int id) {
         ResponseData responseData = new ResponseData();
         HttpStatus status = HttpStatus.OK;
         teacherService.deleteTeacher(id);
-            responseData.setSuccess(Boolean.TRUE);
-            status = HttpStatus.OK;
-            responseData.setMessage("Xóa giáo viên thành công");
+        responseData.setSuccess(Boolean.TRUE);
+        status = HttpStatus.OK;
+        responseData.setMessage("Xóa giáo viên thành công");
         return ResponseEntity.status(status).body(responseData);
     }
 }

@@ -5,10 +5,14 @@ import com.example.PPQ.Exception.ForbiddenException;
 import com.example.PPQ.Exception.ResourceNotFoundException;
 import com.example.PPQ.Payload.Projection_Interface.StudentCoreView;
 import com.example.PPQ.Payload.Request.StudentRequest;
+import com.example.PPQ.Payload.Response.PageResponse;
 import com.example.PPQ.Payload.Response.StudentDTO;
 import com.example.PPQ.Service.StudentService;
 import com.example.PPQ.respository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,14 +35,14 @@ public class StudentServiceImp implements StudentService {
     @Autowired
     ClassRepository classRespository;
     @Override
-    public List<StudentDTO> getAllStudents() {
-        List<StudentEntity> listStudent=studentRespository.findAll();
-        if(listStudent.isEmpty()) {
-            throw new ResourceNotFoundException("Hệ thống chưa tồn tại học sinh ");
-        }
-        return listStudent.stream()
-                .map(x->new StudentDTO(x))
-                .collect(Collectors.toList());
+    public PageResponse<StudentDTO> getAllStudents(Integer page,Integer size) {
+        Pageable pageable = PageRequest.of(page ,size);
+        Page<StudentEntity> listStudentPage=studentRespository.findAll(pageable);
+//        if(listStudentPage.isEmpty()) {
+//            throw new ResourceNotFoundException("Hệ thống chưa tồn tại học sinh ");
+//        }
+        Page<StudentDTO> pageStudentDTO = listStudentPage.map(x->new StudentDTO(x));
+        return new PageResponse<>(pageStudentDTO);
     }
 
 

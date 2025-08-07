@@ -27,12 +27,6 @@ spring:
       enabled: true
       max-file-size: 10MB
       max-request-size: 10MB
-  web:
-    resources:
-      static-locations:
-        - classpath:/static/
-        - file:../../upload/
-
 
   mail:
     host: smtp.gmail.com
@@ -70,6 +64,8 @@ spring:
             user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
 app:
   base-url: ${BASE_URL:http://localhost:8080}
+  upload-file:
+    base-path: ${UPLOAD_BASE_PATH:D:/project_PPQ/upload}
 payment:
   bank-code: MB
   account-number: 0386330822
