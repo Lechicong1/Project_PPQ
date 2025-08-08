@@ -8,6 +8,7 @@ import com.example.PPQ.Payload.Request.StudentRequest;
 import com.example.PPQ.Payload.Response.PageResponse;
 import com.example.PPQ.Payload.Response.StudentDTO;
 import com.example.PPQ.Service.StudentService;
+import com.example.PPQ.Specification.StudentSpecification;
 import com.example.PPQ.respository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -35,12 +36,10 @@ public class StudentServiceImp implements StudentService {
     @Autowired
     ClassRepository classRespository;
     @Override
-    public PageResponse<StudentDTO> getAllStudents(Integer page,Integer size) {
+    public PageResponse<StudentDTO> getAllStudents( String name,String phoneNumber,  Integer page,Integer size) {
         Pageable pageable = PageRequest.of(page ,size);
-        Page<StudentEntity> listStudentPage=studentRespository.findAll(pageable);
-//        if(listStudentPage.isEmpty()) {
-//            throw new ResourceNotFoundException("Hệ thống chưa tồn tại học sinh ");
-//        }
+        // loc va phan trang
+        Page<StudentEntity> listStudentPage=studentRespository.findAll(StudentSpecification.search(name, phoneNumber) ,pageable);
         Page<StudentDTO> pageStudentDTO = listStudentPage.map(x->new StudentDTO(x));
         return new PageResponse<>(pageStudentDTO);
     }
@@ -51,7 +50,10 @@ public class StudentServiceImp implements StudentService {
         StudentEntity studentEntity=studentRespository.findById(id).orElseThrow(()->new ResourceNotFoundException("User không tồn tại"));
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         String userNameRequest = usersRepository.findUserNameById(id);
-        if(!username.equals(userNameRequest)) {
+        String roleUserCur = SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities().iterator().next().getAuthority();
+        RolesEntity roleAdmin = rolesRespository.findByRoleName("ADMIN");
+        if(!username.equals(userNameRequest) && !roleUserCur.equals(roleAdmin.getRoleName())) {
             throw new ForbiddenException("Bạn không được quyền chỉnh sửa học sinh này ");
         }
         if(student.getfullName()!=null){
@@ -130,16 +132,16 @@ public class StudentServiceImp implements StudentService {
     }
 
 
-    @Override
-    public List<StudentDTO> searchBynameAndPhoneNumber(String name, String phoneNumber) {
-
-        List<StudentEntity> listStudent=studentRespository.searchByNameAndPhoneNumber(name,phoneNumber);
-        if(listStudent.isEmpty()){
-            throw new ResourceNotFoundException("Hệ thống chưa tồn tại học sinh "); }
-
-        return listStudent.stream()
-                .map(s-> new StudentDTO(s))
-                .collect(Collectors.toList());
-
-    }
+//    @Override
+//    public List<StudentDTO> searchBynameAndPhoneNumber(String name, String phoneNumber) {
+//
+//        List<StudentEntity> listStudent=studentRespository.searchByNameAndPhoneNumber(name,phoneNumber);
+//        if(listStudent.isEmpty()){
+//            throw new ResourceNotFoundException("Hệ thống chưa tồn tại học sinh "); }
+//
+//        return listStudent.stream()
+//                .map(s-> new StudentDTO(s))
+//                .collect(Collectors.toList());
+//
+//    }
 }

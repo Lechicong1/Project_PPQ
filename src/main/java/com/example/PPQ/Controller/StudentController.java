@@ -22,10 +22,13 @@ public class StudentController {
     @Autowired
     StudentService studentService;
     @GetMapping
-    public ResponseEntity<?> getAllStudents(@RequestParam Integer page, @RequestParam Integer size) {
+    public ResponseEntity<?> getAllStudents( @RequestParam(required = false) String name ,
+                                             @RequestParam(required = false) String phone ,
+                                             @RequestParam Integer page,
+                                             @RequestParam Integer size) {
         ResponseData responseData = new ResponseData();
         HttpStatus status = HttpStatus.OK;
-        PageResponse<StudentDTO> pageStudentReponse=studentService.getAllStudents(page-1, size);
+        PageResponse<StudentDTO> pageStudentReponse=studentService.getAllStudents(name, phone,page-1, size);
             responseData.setData(pageStudentReponse);
             responseData.setSuccess(Boolean.TRUE);
             status = HttpStatus.OK;
@@ -43,18 +46,17 @@ public class StudentController {
             status = HttpStatus.OK;
         return ResponseEntity.status(status).body(responseData);
     }
-    @GetMapping("/search")
-    public ResponseEntity<?> getStudentByName(@RequestParam(required = false ) String name,@RequestParam(required = false) String phoneNumber) {
-        ResponseData responseData = new ResponseData();
-        HttpStatus status ;
-        List<StudentDTO> student_dto = studentService.searchBynameAndPhoneNumber(name,phoneNumber);
-
-            responseData.setData(student_dto);
-            responseData.setSuccess(Boolean.TRUE);
-            status = HttpStatus.OK;
-
-        return ResponseEntity.status(status).body(responseData);
-    }
+//    @GetMapping("/search")
+//    public ResponseEntity<?> getStudentByName(@RequestParam(required = false ) String name,@RequestParam(required = false) String phoneNumber) {
+//        ResponseData responseData = new ResponseData();
+//        HttpStatus status ;
+//        List<StudentDTO> student_dto = studentService.searchBynameAndPhoneNumber(name,phoneNumber);
+//            responseData.setData(student_dto);
+//            responseData.setSuccess(Boolean.TRUE);
+//            status = HttpStatus.OK;
+//
+//        return ResponseEntity.status(status).body(responseData);
+//    }
 
 //    @PostMapping
 //    public ResponseEntity<?> addStudent( @Valid @RequestBody StudentRequest studentRequest) {

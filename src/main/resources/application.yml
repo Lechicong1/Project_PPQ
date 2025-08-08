@@ -66,6 +66,8 @@ app:
   base-url: ${BASE_URL:http://localhost:8080}
   upload-file:
     base-path: ${UPLOAD_BASE_PATH:D:/project_PPQ/upload}
+  cors:
+    allowed-origin: ${ALLOWED_ORIGINS:http://127.0.0.1:5500}
 payment:
   bank-code: MB
   account-number: 0386330822

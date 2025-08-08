@@ -5,6 +5,7 @@ import com.example.PPQ.Payload.Projection_Interface.CourseView;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -12,11 +13,11 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
-public interface CourseRepository extends JpaRepository<CourseEntity,Integer> {
+public interface CourseRepository extends JpaRepository<CourseEntity,Integer> , JpaSpecificationExecutor<CourseEntity> {
     @Query("SELECT DISTINCT c.language FROM CourseEntity c")
     List<String> getAllLanguages();
-    Page<CourseEntity> findAll(Pageable pageable);
-    Page<CourseEntity> findByLanguage(String language,Pageable pageable);
+//    Page<CourseEntity> findAll(Pageable pageable);
+//    Page<CourseEntity> findByLanguage(String language,Pageable pageable);
     List<CourseEntity> findAllByIdIn(Set<Integer> listIdCourse);
     @Query(value = "select " +
             "            c.nameCourse as nameCourse, " +

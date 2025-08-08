@@ -9,6 +9,7 @@ import com.example.PPQ.Payload.Projection_Interface.CourseView;
 import com.example.PPQ.Payload.Response.PageResponse;
 import com.example.PPQ.Service.CourseService;
 import com.example.PPQ.Service.FileStorageService;
+import com.example.PPQ.Specification.CourseSpecification;
 import com.example.PPQ.respository.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -73,27 +74,26 @@ public class CourseServiceImp implements CourseService {
         return Jsoup.clean(html, "", safelist, outputSettings);
     }
     private Sort getSortFromOption(String sortOption) {
+        if (sortOption == null) {
+            sortOption = "name_asc"; // hoặc giá trị mặc định bạn muốn
+        }
         return switch (sortOption) {
             case "name_asc" -> Sort.by("nameCourse").ascending();
             case "name_desc" -> Sort.by("nameCourse").descending();
             case "price_asc" -> Sort.by("Fee").ascending();
             case "price_desc" -> Sort.by("Fee").descending();
-            case "session_desc" -> Sort.by("numberSession").descending();
+            case "session_desc" -> Sort.by("numberSessions").descending();
             default -> Sort.by("nameCourse").ascending();
         };
     }
 
     @Override
     public PageResponse<CourseDTO> getAllCourses(String language, Integer page, Integer size , String sortOption) {
+        System.out.println("languague input" + language);
         Sort sort = getSortFromOption(sortOption);
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<CourseEntity> coursePageEntity;
-        if (language != null && !language.isEmpty()) {
-            coursePageEntity = courseRespository.findByLanguage(language, pageable);
-        } else {
-            coursePageEntity = courseRespository.findAll(pageable);
-        }
-
+        coursePageEntity = courseRespository.findAll(CourseSpecification.search(language),pageable);
         String Url = baseUrl + "/upload/courses/";
         Page<CourseDTO> courseDTOPage = coursePageEntity.map(courseEntity -> {
                CourseDTO c= new CourseDTO(courseEntity);

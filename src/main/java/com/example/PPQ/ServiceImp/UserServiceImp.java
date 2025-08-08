@@ -78,7 +78,9 @@ public class UserServiceImp implements UserService {
     public void updateUsers(int id,UsersRequest usersRequest) {
         UserEntity user = users_repository.findById(id).orElseThrow(()->new ResourceNotFoundException("User không tồn tại"));
             if(usersRequest.getPassWord()!=null)  user.setPassword(passwordEncoder.encode(usersRequest.getPassWord()));
+         roles_repository.findById(usersRequest.getIdRoles()).orElseThrow(()-> new ResourceNotFoundException("Role không tồn tại"));
             if(usersRequest.getIdRoles()!=null)   user.setIdRoles(usersRequest.getIdRoles());
+
             users_repository.save(user);
     }
     @Transactional

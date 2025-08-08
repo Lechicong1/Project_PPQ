@@ -48,12 +48,12 @@ public class CourseController {
     }
     @GetMapping
     public ResponseEntity<?> getAllCourses(@RequestParam(required = false) String languages,
-                                           @RequestParam Integer page,
-                                           @RequestParam Integer size,
+                                           @RequestParam(required = false) Integer page,
+                                           @RequestParam(required = false) Integer size,
                                            @RequestParam(required = false) String sort) {
         ResponseData responseData = new ResponseData();
         HttpStatus status = HttpStatus.OK;
-        PageResponse<CourseDTO> pageCourse =courseService.getAllCourses(languages, page - 1,size,sort);
+        PageResponse<CourseDTO> pageCourse =courseService.getAllCourses(languages, (page==null)? 0 : page - 1, size==null?5: size,sort);
         responseData.setData(pageCourse);
         responseData.setSuccess(Boolean.TRUE);
         status = HttpStatus.OK;

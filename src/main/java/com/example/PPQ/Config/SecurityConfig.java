@@ -2,6 +2,7 @@ package com.example.PPQ.Config;
 
 import com.example.PPQ.ServiceImp.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -76,11 +77,12 @@ public class SecurityConfig {
         return http.build();
     }
 
-
+    @Value("${app.cors.allowed-origin}")
+    private String allowOrigin;
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5500")); // hoặc 127.0.0.1 nếu dùng IP
+        config.setAllowedOrigins(List.of(allowOrigin)); // hoặc 127.0.0.1 nếu dùng IP
         // ✅ Cho tất cả domain, phù hợp cho máy ảo, máy thật
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));

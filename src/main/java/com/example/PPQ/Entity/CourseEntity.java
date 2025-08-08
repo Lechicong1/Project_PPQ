@@ -16,15 +16,15 @@ public class CourseEntity {
     private int id;
     private String nameCourse;
     @Column(columnDefinition = "LONGTEXT")
-    private String Description;
-    private BigDecimal Fee;
+    private String description;
+    private BigDecimal fee;
     private Integer numberSessions;
     private String language;
     private String imagePath;
     public CourseEntity(CourseRequest courseRequest) {
         this.nameCourse = courseRequest.getNameCourse();
-        this.Description = courseRequest.getDescription();
-        this.Fee = courseRequest.getFee();
+        this.description = courseRequest.getDescription();
+        this.fee = courseRequest.getFee();
         this.numberSessions = courseRequest.getNumberSessions();
         this.language = courseRequest.getLanguage();
 

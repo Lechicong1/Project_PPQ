@@ -28,16 +28,16 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getAllUsers(@RequestParam Integer page, @RequestParam Integer size) {
-        ResponseData responseData = new ResponseData();
-        HttpStatus status;
-        PageResponse<UserDTO> ListUsersPage = userService.getAllUsers(page - 1, size);
-        responseData.setData(ListUsersPage);
-        responseData.setSuccess(true);
-        status = HttpStatus.OK;
-        return ResponseEntity.status(status).body(responseData);
-    }
+//    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<?> getAllUsers(@RequestParam Integer page, @RequestParam Integer size) {
+//        ResponseData responseData = new ResponseData();
+//        HttpStatus status;
+//        PageResponse<UserDTO> ListUsersPage = userService.getAllUsers(page - 1, size);
+//        responseData.setData(ListUsersPage);
+//        responseData.setSuccess(true);
+//        status = HttpStatus.OK;
+//        return ResponseEntity.status(status).body(responseData);
+//    }
 
     @PreAuthorize("hasAnyAuthority('STUDENT','TEACHER','ADMIN','USER')")
     @GetMapping("/me")
@@ -115,7 +115,7 @@ public class UserController {
     ) {
         ResponseData responseData = new ResponseData();
         HttpStatus status;
-        PageResponse<UserDTO> listUserDTO = userService.findUserByUsernameAndRole(username, role, page, size);
+        PageResponse<UserDTO> listUserDTO = userService.findUserByUsernameAndRole(username, role, page-1, size);
         responseData.setData(listUserDTO);
         responseData.setSuccess(true);
         status = HttpStatus.OK;

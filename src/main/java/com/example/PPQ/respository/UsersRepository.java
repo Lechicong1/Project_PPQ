@@ -14,17 +14,17 @@ import java.util.Set;
 
 @Repository
 public interface UsersRepository extends JpaRepository<UserEntity, Integer> {
-    @Query(value = """
-            SELECT 
-                u.ID as id, 
-                u.username as userName, 
-                r.roleName as roleName
-            FROM Users u 
-            LEFT JOIN Roles r ON u.idRoles = r.ID
-            """,
-            countQuery = "SELECT COUNT(*) FROM Users",
-            nativeQuery = true)
-    Page<UserView> getAllUsersPagination(Pageable pageable);  // spring tu them limit va offset vao value
+        @Query(value = """
+                SELECT 
+                    u.ID as id, 
+                    u.username as userName, 
+                    r.roleName as roleName
+                FROM Users u 
+                LEFT JOIN Roles r ON u.idRoles = r.ID
+                """,
+                countQuery = "SELECT COUNT(*) FROM Users",
+                nativeQuery = true)
+        Page<UserView> getAllUsersPagination(Pageable pageable);  // spring tu them limit va offset vao value
 
     boolean existsByUsername(String username);
 
@@ -41,7 +41,7 @@ public interface UsersRepository extends JpaRepository<UserEntity, Integer> {
             FROM Users u 
             LEFT JOIN Roles r ON u.idRoles = r.ID
             WHERE 
-                (:username IS NULL OR :username = '' OR u.username LIKE %:username%) 
+                (:username IS NULL OR :username = '' OR u.username LIKE concat(:username, '%')) 
                 AND (:role IS NULL OR u.idRoles = :role)
             """,
             countQuery = """
@@ -49,7 +49,7 @@ public interface UsersRepository extends JpaRepository<UserEntity, Integer> {
                     FROM Users u 
                     LEFT JOIN Roles r ON u.idRoles = r.ID
                     WHERE 
-                        (:username IS NULL OR :username = '' OR u.username LIKE %:username%) 
+                        (:username IS NULL OR :username = '' OR u.username LIKE concat(:username, '%')) 
                         AND (:role IS NULL OR u.idRoles = :role)
                     """,
             nativeQuery = true)
