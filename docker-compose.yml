@@ -2,21 +2,35 @@ version: "3.9"
 
 services:
   backend:
-    build: .
-    image: lechicong01/springppq:latest
+    image: lechicong01/springppq:v1
     container_name: springppq-backend
     ports:
       - "8080:8080"
+    volumes:
+      - /var/www/ppq/upload:/app/upload
+      - ./logs:/app/logs
     environment:
       DB_URL: jdbc:mysql://mysqljava:3306/PPQ
-      BASE_URL: http://localhost:8080
+      BASE_URL: http://192.168.0.106:8080
+      UPLOAD_BASE_PATH: /app/upload
       DB_USER: root
       DB_PASS: admin123
       REDIS_HOST: redis
-      REDIS_PORT: 6380
+      REDIS_PORT: 6379
+      ALLOWED_ORIGINS: http://192.168.0.106
     depends_on:
       - mysqljava
       - redis
+    networks:
+      - ppq-network
+
+  frontend:
+    image: lechicong01/my-frontend:latest
+    container_name: ppq-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
     networks:
       - ppq-network
 
@@ -36,7 +50,7 @@ services:
     image: redis:7.2
     container_name: redis
     ports:
-      - "6380:6379"
+      - "6379:6379"
     networks:
       - ppq-network
 

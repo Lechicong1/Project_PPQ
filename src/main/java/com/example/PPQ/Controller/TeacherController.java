@@ -59,7 +59,7 @@ public class TeacherController {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> addTeacher(@Valid @RequestPart("teacherRequest") String teacherRequestStr, @RequestPart("file") MultipartFile file) {
+    public ResponseEntity<?> addTeacher(@Valid @RequestPart("teacherRequest") String teacherRequestStr, @RequestPart(value = "file",required = false)  MultipartFile file) {
         ObjectMapper objectMapper = new ObjectMapper();
         TeacherRequest teacherRequest = null;
         try {
