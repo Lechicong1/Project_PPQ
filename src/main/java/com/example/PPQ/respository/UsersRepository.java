@@ -1,6 +1,7 @@
 package com.example.PPQ.respository;
 
 import com.example.PPQ.Entity.UserEntity;
+import com.example.PPQ.Enums.Role;
 import com.example.PPQ.Payload.Projection_Interface.UserView;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -61,7 +62,7 @@ public interface UsersRepository extends JpaRepository<UserEntity, Integer> {
     @Modifying
     @Query(value = "with roleUsers as ( select r.ID from Roles as r where r.roleName = :roleName limit 1)\n" +
             "update Users u set u.idRoles = (select r.ID from roleUsers as r ) where u.ID = :idUser", nativeQuery = true)
-    void setRolesUsers(String roleName, int idUser);
+    void setRolesUsers(Role roleName, int idUser);
 
     @Modifying
     @Query("update UserEntity as u \n" +
@@ -69,6 +70,6 @@ public interface UsersRepository extends JpaRepository<UserEntity, Integer> {
             "where u.idRoles =:idRoles")
     void removeUserRole(int idRoles);
 
-    @Query("Select u.username from UserEntity u where u.Id = :id")
+    @Query("Select u.username from UserEntity u where u.id = :id")
     String findUserNameById(int id);
 }

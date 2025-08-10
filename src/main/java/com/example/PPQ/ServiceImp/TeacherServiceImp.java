@@ -1,6 +1,7 @@
 package com.example.PPQ.ServiceImp;
 
 import com.example.PPQ.Entity.*;
+import com.example.PPQ.Enums.Role;
 import com.example.PPQ.Exception.DuplicateResourceException;
 import com.example.PPQ.Exception.ForbiddenException;
 import com.example.PPQ.Exception.ResourceNotFoundException;
@@ -73,13 +74,13 @@ public class TeacherServiceImp implements TeacherService {
         TeacherEntity teacher = new TeacherEntity(teacherRequest);
         teacher.setImagePath(fileName);
         teacherRespository.save(teacher);
-        usersRepository.setRolesUsers("TEACHER", userEntity.getId());
+        usersRepository.setRolesUsers(Role.TEACHER, userEntity.getId());
     }
     @Override
     public void deleteTeacher(int idTeacher) {
         TeacherEntity teacherDelete = teacherRespository.findById(idTeacher).orElseThrow(() -> new ResourceNotFoundException("Không tồn tại giáo viên để xóa"));
         // cap nhat role cua teacher ve thanh user trong bang user
-        usersRepository.setRolesUsers("USER", idTeacher);
+        usersRepository.setRolesUsers(Role.USER, idTeacher);
         classRespository.setIdTeacherNull(idTeacher);
         // Lấy tên file ảnh
         String fileName = teacherDelete.getImagePath(); // ví dụ: "abc123.jpg"
@@ -99,7 +100,7 @@ public class TeacherServiceImp implements TeacherService {
 
         UserEntity userChange = usersRepository.findById(teacher.getIdUsers()).orElseThrow( ()-> new ResourceNotFoundException("User không tồn tại"));
         String userNameChange = userChange.getUsername();
-        RolesEntity roleAdmin = rolesRespository.findByRoleName("ADMIN");
+        RolesEntity roleAdmin = rolesRespository.findByRoleName(Role.ADMIN);
         if (!userNameCur.equals(userNameChange) && !roleUserCur.equals(roleAdmin.getRoleName()))
             throw new ForbiddenException("Bạn không được quyền chỉnh sửa giáo viên này ");
         if (teacherRequest.getEducationLevel() != null) teacher.setEducationLevel(teacherRequest.getEducationLevel());

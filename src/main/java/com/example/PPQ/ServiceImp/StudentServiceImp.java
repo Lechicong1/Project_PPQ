@@ -1,6 +1,7 @@
 package com.example.PPQ.ServiceImp;
 
 import com.example.PPQ.Entity.*;
+import com.example.PPQ.Enums.Role;
 import com.example.PPQ.Exception.ForbiddenException;
 import com.example.PPQ.Exception.ResourceNotFoundException;
 import com.example.PPQ.Payload.Projection_Interface.StudentCoreView;
@@ -52,7 +53,7 @@ public class StudentServiceImp implements StudentService {
         String userNameRequest = usersRepository.findUserNameById(id);
         String roleUserCur = SecurityContextHolder.getContext().getAuthentication()
                 .getAuthorities().iterator().next().getAuthority();
-        RolesEntity roleAdmin = rolesRespository.findByRoleName("ADMIN");
+        RolesEntity roleAdmin = rolesRespository.findByRoleName(Role.ADMIN);
         if(!username.equals(userNameRequest) && !roleUserCur.equals(roleAdmin.getRoleName())) {
             throw new ForbiddenException("Bạn không được quyền chỉnh sửa học sinh này ");
         }
@@ -77,7 +78,7 @@ public class StudentServiceImp implements StudentService {
             studentRespository.deleteById(id);
 
            //set role từ student xuống user
-            usersRepository.setRolesUsers("USER",id);
+            usersRepository.setRolesUsers(Role.USER,id);
 
 
     }

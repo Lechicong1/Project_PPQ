@@ -1,6 +1,7 @@
 package com.example.PPQ.ServiceImp;
 
 import com.example.PPQ.Entity.*;
+import com.example.PPQ.Enums.Role;
 import com.example.PPQ.Exception.BusinessLogicException;
 import com.example.PPQ.Exception.ResourceNotFoundException;
 import com.example.PPQ.Payload.Projection_Interface.UserView;
@@ -95,7 +96,7 @@ public class UserServiceImp implements UserService {
 
     @Override
     public List<UserDTO> getAllUserByRoleTeacher() {
-        RolesEntity role_teacher=roles_repository.findByRoleName("TEACHER");
+        RolesEntity role_teacher=roles_repository.findByRoleName(Role.TEACHER);
         if(role_teacher==null){
             throw new ResourceNotFoundException("Role Teacher không tồn tại");
         }
