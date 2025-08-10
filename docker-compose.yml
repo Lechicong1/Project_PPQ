@@ -27,7 +27,7 @@ services:
       - ppq-network
 
   frontend:
-    image: lechicong01/my-frontend:v1
+    image: lechicong01/my-frontend:v2
     container_name: ppq-frontend
     ports:
       - "80:80"
