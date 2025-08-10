@@ -1,6 +1,7 @@
 package com.example.PPQ.ServiceImp;
 
 import com.example.PPQ.Entity.*;
+import com.example.PPQ.Enums.Role;
 import com.example.PPQ.Exception.DuplicateResourceException;
 import com.example.PPQ.Exception.ResourceNotFoundException;
 import com.example.PPQ.Payload.Projection_Interface.paymentView;
@@ -131,7 +132,7 @@ public class PaymentServiceImp implements com.example.PPQ.Service.PaymentService
             studentRespository.save(student_Entity);
             courseStudentClassRepository.save(course_StudentEntity);
             // sau khi dang ki khoa hoc thanh cong set role cua user do thanh student
-            RolesEntity roleStudent=rolesRespository.findByRoleName("STUDENT");
+            RolesEntity roleStudent=rolesRespository.findByRoleName(Role.STUDENT);
             UserEntity user= usersRepository.findById(paymentRequest.getUserId()).orElseThrow(()-> new ResourceNotFoundException("Không tồn tại user"));
             user.setIdRoles(roleStudent.getId());
             usersRepository.save(user);

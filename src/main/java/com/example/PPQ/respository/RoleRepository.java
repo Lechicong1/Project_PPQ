@@ -1,6 +1,7 @@
 package com.example.PPQ.respository;
 
 import com.example.PPQ.Entity.RolesEntity;
+import com.example.PPQ.Enums.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,7 +10,7 @@ import java.util.Set;
 
 @Repository
 public interface RoleRepository extends JpaRepository<RolesEntity, Integer> {
-    public RolesEntity findByRoleName(String rolename);
+    public RolesEntity findByRoleName(Role roles);
 
     List<RolesEntity> findAllByIdIn(Set<Integer> ids);
 }

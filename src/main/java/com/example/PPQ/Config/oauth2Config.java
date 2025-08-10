@@ -2,12 +2,14 @@ package com.example.PPQ.Config;
 
 import com.example.PPQ.Entity.RolesEntity;
 import com.example.PPQ.Entity.UserEntity;
+import com.example.PPQ.Enums.Role;
 import com.example.PPQ.respository.RoleRepository;
 import com.example.PPQ.respository.UsersRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -30,6 +32,8 @@ public class oauth2Config implements AuthenticationSuccessHandler {
     RoleRepository roleRepo;
     @Autowired
     JwtCustom jwtCustom;
+    @Value("${app.cors.allowed-origin}")
+    String frontendUrl;
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
@@ -50,7 +54,7 @@ public class oauth2Config implements AuthenticationSuccessHandler {
             user = new UserEntity();
             user.setUsername(email);
             // Gán quyền mặc định
-            RolesEntity defaultRole = roleRepo.findByRoleName("USER");
+            RolesEntity defaultRole = roleRepo.findByRoleName(Role.USER);
             user.setIdRoles(defaultRole.getId());
             usersRepository.save(user);
         }
@@ -73,8 +77,8 @@ public class oauth2Config implements AuthenticationSuccessHandler {
         cookie.setPath("/");
         cookie.setHttpOnly(false); //  nếu muốn FE đọc được thì phải để false
         response.addCookie(cookie);
-        // Chuyển hướng đến FE biết để gọi API lấy JWT
-        response.sendRedirect("http://localhost:5500/oauth2_redirect.html");
+            // Chuyển hướng đến FE biết để gọi API lấy JWT
+            response.sendRedirect( frontendUrl+"/oauth2_redirect.html");
 
     }
 }

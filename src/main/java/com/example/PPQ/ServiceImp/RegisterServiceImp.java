@@ -2,6 +2,7 @@ package com.example.PPQ.ServiceImp;
 
 import com.example.PPQ.Entity.RolesEntity;
 import com.example.PPQ.Entity.UserEntity;
+import com.example.PPQ.Enums.Role;
 import com.example.PPQ.Exception.DuplicateResourceException;
 import com.example.PPQ.Exception.InvalidInputException;
 import com.example.PPQ.Exception.ResourceNotFoundException;
@@ -25,7 +26,7 @@ public class RegisterServiceImp implements com.example.PPQ.Service.RegisterServi
     @Override
     public void register( @Valid registerRequest request) {
         UserEntity user = new UserEntity();
-        RolesEntity roleDefault = roles_repository.findByRoleName("USER");
+        RolesEntity roleDefault = roles_repository.findByRoleName(Role.USER);
         if(roleDefault==null)
             throw new ResourceNotFoundException("Roles USER không tồn tại");
         if(users_repository.existsByUsername(request.getUsername())){

@@ -14,6 +14,7 @@ public class RolesEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @Enumerated(EnumType.STRING) // Lưu tên enum như chuỗi "TEACHER"
     private String roleName;
     private String Description;
     public RolesEntity() {
