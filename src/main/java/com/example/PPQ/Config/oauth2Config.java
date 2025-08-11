@@ -62,7 +62,7 @@ public class oauth2Config implements AuthenticationSuccessHandler {
         RolesEntity rolesEntity=roleRepo.findById(user.getIdRoles()).orElseThrow(()->new UsernameNotFoundException("Không tồn tại roles"));
         // Tạo danh sách quyền
         List<GrantedAuthority> authorities = List.of(
-                new SimpleGrantedAuthority(rolesEntity.getRoleName())
+                new SimpleGrantedAuthority(rolesEntity.getRoleName().name())
         );
 
         // Tạo userDetail mới
@@ -78,7 +78,8 @@ public class oauth2Config implements AuthenticationSuccessHandler {
         cookie.setHttpOnly(false); //  nếu muốn FE đọc được thì phải để false
         response.addCookie(cookie);
             // Chuyển hướng đến FE biết để gọi API lấy JWT
-            response.sendRedirect( frontendUrl+"/oauth2_redirect.html");
+        System.out.println(frontendUrl+"/oauth2_redirect.html");
+        response.sendRedirect( frontendUrl+"/oauth2_redirect.html");
 
     }
 }

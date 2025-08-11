@@ -14,7 +14,7 @@ public class RolesDTO {
     public RolesDTO(){}
     public RolesDTO(RolesEntity e){
         this.id = e.getId();
-        this.roleName = e.getRoleName();
+        this.roleName = e.getRoleName().name();
         this.description = e.getDescription();
 
     }

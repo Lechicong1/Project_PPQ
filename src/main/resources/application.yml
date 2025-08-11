@@ -59,7 +59,7 @@ spring:
             scope:
               - email
               - profile
-            redirect-uri: "{baseUrl}/login/oauth2/code/google"  # baseUrl mặc định là http://localhost:8080
+            redirect-uri: ${REDIRECT_URI:http://localhost:8080/login/oauth2/code/google}  # baseUrl mặc định là http://localhost:8080
         provider:
           google:
             authorization-uri: https://accounts.google.com/o/oauth2/v2/auth

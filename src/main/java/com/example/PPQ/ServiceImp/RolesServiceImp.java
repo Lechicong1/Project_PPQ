@@ -1,6 +1,7 @@
 package com.example.PPQ.ServiceImp;
 
 import com.example.PPQ.Entity.RolesEntity;
+import com.example.PPQ.Enums.Role;
 import com.example.PPQ.Exception.ResourceNotFoundException;
 import com.example.PPQ.Payload.Request.RolesRequest;
 import com.example.PPQ.Payload.Response.RolesDTO;
@@ -41,7 +42,8 @@ public class RolesServiceImp implements RoleService {
     @Override
     public void updateRoles(int id,RolesRequest RolesRequest) {
         RolesEntity roles = roleRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User không tồn tại"));
-            if(RolesRequest.getRoleName()!=null) roles.setRoleName(RolesRequest.getRoleName());
+            if(RolesRequest.getRoleName()!=null) roles.setRoleName(Role.valueOf(RolesRequest.getRoleName().toUpperCase()));
+
             if(RolesRequest.getDescription()!=null) roles.setDescription(RolesRequest.getDescription());
 
         roleRepo.save(roles);

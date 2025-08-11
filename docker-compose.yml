@@ -1,8 +1,35 @@
 version: "3.9"
 
 services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    container_name: nginx-proxy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./certs:/etc/nginx/certs
+      - ./vhost.d:/etc/nginx/vhost.d
+      - ./html:/usr/share/nginx/html
+
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    container_name: nginx-letsencrypt
+    restart: always
+    depends_on:
+      - nginx-proxy
+    environment:
+      - NGINX_PROXY_CONTAINER=nginx-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./certs:/etc/nginx/certs
+      - ./vhost.d:/etc/nginx/vhost.d
+      - ./html:/usr/share/nginx/html
+
   backend:
-    image: lechicong01/springppq:v2
+    image: lechicong01/springppq:v3
     container_name: springppq-backend
     ports:
       - "8080:8080"
@@ -11,13 +38,18 @@ services:
       - /var/www/ppq/logs:/app/logs
     environment:
       DB_URL: jdbc:mysql://mysqljava:3306/PPQ
-      BASE_URL: http://192.168.0.106:8080
+      BASE_URL: http://baostar-286990.thuevpsgiare.com.vn:8080
       UPLOAD_BASE_PATH: /app/upload
       DB_USER: root
       DB_PASS: admin123
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      ALLOWED_ORIGINS: http://192.168.0.106
+      ALLOWED_ORIGINS: http://baostar-286990.thuevpsgiare.com.vn
+      REDIRECT_URI: http://baostar-286990.thuevpsgiare.com.vn:8080/login/oauth2/code/google
+      VIRTUAL_HOST: baostar-286990.thuevpsgiare.com.vn
+      LETSENCRYPT_HOST: baostar-286990.thuevpsgiare.com.vn
+      LETSENCRYPT_EMAIL: Lechicong9a2@gmail.com.com
+
     depends_on:
       mysqljava:
         condition: service_healthy
@@ -27,8 +59,13 @@ services:
       - ppq-network
 
   frontend:
-    image: lechicong01/my-frontend:v2
+    image: lechicong01/my-frontend:v3
     container_name: ppq-frontend
+    restart: always
+    environment:
+      VIRTUAL_HOST: baostar-286990.thuevpsgiare.com.vn
+      LETSENCRYPT_HOST: baostar-286990.thuevpsgiare.com.vn
+      LETSENCRYPT_EMAIL: lechicong9a2@gmail.com
     ports:
       - "80:80"
     depends_on:

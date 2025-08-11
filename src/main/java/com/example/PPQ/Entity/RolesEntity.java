@@ -1,5 +1,6 @@
 package com.example.PPQ.Entity;
 
+import com.example.PPQ.Enums.Role;
 import com.example.PPQ.Payload.Request.RolesRequest;
 import jakarta.persistence.*;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -15,12 +16,12 @@ public class RolesEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @Enumerated(EnumType.STRING) // Lưu tên enum như chuỗi "TEACHER"
-    private String roleName;
+    private Role roleName;
     private String Description;
     public RolesEntity() {
     }
     public RolesEntity(RolesRequest req){
-        this.roleName = req.getRoleName();
+        this.roleName =  Role.valueOf(req.getRoleName().toUpperCase());
         this.Description = req.getDescription();
     }
 }

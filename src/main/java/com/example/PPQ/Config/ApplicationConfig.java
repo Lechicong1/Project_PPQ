@@ -29,15 +29,20 @@ public class ApplicationConfig
             for (Role roleType : Role.values()) {
                 if (roleRepo.findByRoleName(roleType) == null) {
                     RolesEntity role = new RolesEntity();
-                    role.setRoleName(roleType.name());
+                    role.setRoleName(roleType);
                     roleRepo.save(role);
                 }
             }
             if (user_repository.findByUsername("admin") == null) {
+                RolesEntity adminRole = roleRepo.findByRoleName(Role.ADMIN);
+                if (adminRole == null) {
+                    throw new IllegalStateException("ADMIN role not found. Seed roles first.");
+                }
                 UserEntity user = new UserEntity();
                 user.setUsername("admin");
                 user.setPassword(passwordEncoder.encode("admin"));
-                user.setIdRoles(roleRepo.findByRoleName(Role.ADMIN).getId());
+                System.out.println("roleadmin " + adminRole.getId());
+                user.setIdRoles(adminRole.getId());
                 try {
                     user_repository.save(user);
 

@@ -32,6 +32,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
                 user.getPassword(),
-                List.of(new SimpleGrantedAuthority(rolesEntity.getRoleName())));
+                List.of(new SimpleGrantedAuthority(rolesEntity.getRoleName().name())));
     } // tao ra doi tuong User cua spring de xac thuc va phan quyen nguoi dung
 }
