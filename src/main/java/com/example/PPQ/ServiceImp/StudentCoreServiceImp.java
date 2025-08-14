@@ -29,21 +29,21 @@ public class StudentCoreServiceImp implements StudentCoreService {
     @Autowired
     AttendanceRepo attendanceRepo;
 
-
     @Override
-    public void updateCoreStudent( Integer idStudent,Integer idClass, StudentCoreRequest studentCoreRequest) {
+    public void updateCoreStudent(Integer idStudent, Integer idClass, StudentCoreRequest studentCoreRequest) {
 
         StudentCoreEntity studentCoreEntity = studentCoreRepo.findByIdStudentAndIdClass(idStudent, idClass);
 
-        if(studentCoreEntity == null){
+        if (studentCoreEntity == null) {
             studentCoreEntity = new StudentCoreEntity();
             studentCoreEntity.setIdStudent(idStudent);
             studentCoreEntity.setIdClass(idClass);
         }
-        if(studentCoreRequest.getScore1() != null) studentCoreEntity.setScore1(studentCoreRequest.getScore1());
-        if(studentCoreRequest.getScore2() != null) studentCoreEntity.setScore2(studentCoreRequest.getScore2());
-        if(studentCoreRequest.getScore3() != null) studentCoreEntity.setScore3(studentCoreRequest.getScore3());
-        if(studentCoreRequest.getScoreHomework() != null) studentCoreEntity.setScoreHomework(studentCoreRequest.getScoreHomework());
+        if (studentCoreRequest.getScore1() != null) studentCoreEntity.setScore1(studentCoreRequest.getScore1());
+        if (studentCoreRequest.getScore2() != null) studentCoreEntity.setScore2(studentCoreRequest.getScore2());
+        if (studentCoreRequest.getScore3() != null) studentCoreEntity.setScore3(studentCoreRequest.getScore3());
+        if (studentCoreRequest.getScoreHomework() != null)
+            studentCoreEntity.setScoreHomework(studentCoreRequest.getScoreHomework());
         studentCoreRepo.save(studentCoreEntity);
     }
 
@@ -90,8 +90,8 @@ public class StudentCoreServiceImp implements StudentCoreService {
         }
         studentCoreRepo.saveAll(toUpdate);
         // lưu thông tin điểm danh vào bảng attendance
-        List<AttendanceEntity> listAttendance =new ArrayList<>();
-        for(AttendanceRequest AttendanceRequest : attendanceReq){
+        List<AttendanceEntity> listAttendance = new ArrayList<>();
+        for (AttendanceRequest AttendanceRequest : attendanceReq) {
             AttendanceEntity entity = new AttendanceEntity(AttendanceRequest);
             listAttendance.add(entity);
         }

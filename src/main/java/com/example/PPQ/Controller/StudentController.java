@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/students")
+@RequestMapping("/api/students")
 @PreAuthorize("hasAuthority('ADMIN')")
 public class StudentController {
     @Autowired

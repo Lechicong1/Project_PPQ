@@ -35,7 +35,7 @@ import java.util.Map;
         @Autowired
         JwtCustom jwtCustom;
 
-            @PostMapping("/login")
+            @PostMapping("/api/login")
             public ResponseEntity<?> login(@Valid  @RequestBody LoginRequest loginRequest, HttpServletResponse response) {
                 HttpStatus status = HttpStatus.OK;
                 // Tạo đối tượng phản hồi

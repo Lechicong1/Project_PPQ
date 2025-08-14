@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @PreAuthorize("hasAuthority('ADMIN')")
-@RequestMapping("/classes")
+@RequestMapping("/api/classes")
 public class ClassController {
     @Autowired
     ClassService classServiceImp;

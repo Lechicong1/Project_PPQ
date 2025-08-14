@@ -23,7 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/teachers")
+@RequestMapping("/api/teachers")
 //@PreAuthorize("hasAuthority('ADMIN')")
 public class TeacherController {
     @Autowired

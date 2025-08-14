@@ -51,10 +51,10 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // ✅ Cho phép preflight CORS
-                        .requestMatchers("/login","/register","courses/{courseId}","/otp/**").permitAll()
-                        .requestMatchers("/upload/**","/contact","/courses/languages").permitAll()
-                         .requestMatchers(HttpMethod.GET, "/courses").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/teachers").permitAll()
+                        .requestMatchers("/api/login","/api/register","/api/courses/{courseId}","/api/otp/**").permitAll()
+                        .requestMatchers("/upload/**","/api/contact","/api/courses/languages").permitAll()
+                         .requestMatchers(HttpMethod.GET, "/api/courses").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/teachers").permitAll()
 
                         .anyRequest().authenticated()
                 )

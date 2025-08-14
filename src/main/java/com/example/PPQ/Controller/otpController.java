@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Random;
 
 @RestController
-@RequestMapping("/otp")
+@RequestMapping("/api/otp")
 public class otpController {
     @Autowired
     otpService otpservice;

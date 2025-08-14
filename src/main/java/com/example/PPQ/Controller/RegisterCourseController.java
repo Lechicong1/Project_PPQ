@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @PreAuthorize("hasAuthority('ADMIN')")
-@RequestMapping("/course/register")
+@RequestMapping("/api/course/register")
 public class RegisterCourseController {
     @Autowired
     RegisterCourseServiceImp registerCourseService;
