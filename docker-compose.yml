@@ -9,14 +9,14 @@ services:
       - /var/www/ppq/logs:/app/logs
     environment:
       DB_URL: jdbc:mysql://mysqljava:3306/PPQ
-      BASE_URL: http://160.250.5.162
+      BASE_URL: http://161.248.4.197
       UPLOAD_BASE_PATH: /app/upload
       DB_USER: root
       DB_PASS: admin123
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      ALLOWED_ORIGINS: http://160.250.5.162
-      REDIRECT_URI: http://160.250.5.162:8080/login/oauth2/code/google
+      ALLOWED_ORIGINS: http://161.248.4.197
+      REDIRECT_URI: http://161.248.4.197:8080/login/oauth2/code/google
     depends_on:
       mysqljava:
         condition: service_healthy
